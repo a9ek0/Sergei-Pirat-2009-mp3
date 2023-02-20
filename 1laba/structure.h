@@ -15,7 +15,7 @@ typedef struct film
     char *name;
     float rating;
     int length;
-    enum {clrDefault, clrYellow, clrGreen, clrRed};
+   // enum {clrDefault, clrYellow, clrGreen, clrRed};
 }film_func;
 
 void arr_structure_print(struct film structure[], int num_of_elements);
