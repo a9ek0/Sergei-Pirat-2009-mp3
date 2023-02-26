@@ -1,7 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
-#include "mylib/structure.h"
+#include <string.h>
+
+enum smart_tv{
+    AVAILABLE,
+    NOT_AVAILABLE
+};
+
+typedef struct{
+    int w;
+    int h;
+}res;
+
+typedef struct{
+    char *name;
+    res resolution;
+    int number_of_hdmi;
+    float panel_thickness;
+    enum smart_tv smart_TV;
+}TV;
+
+void create_struct_arr(TV **structure, int *size);
+void initiate_struct(TV *structure, int size);
+void print_struct(TV *structure, int size);
 
 int main() {
     TV *tv;
@@ -10,4 +31,80 @@ int main() {
     initiate_struct(tv, size);
     print_struct(tv, size);
     return 0;
+}
+
+void menu(TV *structure, int size)
+{
+
+}
+
+void create_struct_arr(TV **structure, int *size)
+{
+    printf("Enter number of structures in array.\n");
+    scanf_s("%d", size);
+    *structure = (TV *) malloc(*size * sizeof(TV));
+}
+
+void initiate_struct(TV *structure, int size)
+{
+    char buffer[255];
+    for (int i = 0; i < size; ++i)
+    {
+        printf("\nEnter Name\n");
+        scanf_s("%s", buffer);
+        structure[i].name = (char *) calloc(strlen(buffer) + 1, sizeof(char));
+        strcpy(structure[i].name, buffer);
+        fflush(stdin);
+        printf("\nEnter width of screen\n");
+        scanf_s("%d", &structure[i].resolution.w);
+        printf("\nEnter height of screen\n");
+        scanf_s("%d", &structure[i].resolution.h);
+        printf("\nEnter number of hdmi ports\n");
+        scanf_s("%f", &structure[i].number_of_hdmi);
+        printf("\nEnter panel thickness\n");
+        scanf_s("%f", &structure[i].panel_thickness);
+        printf("\nDoes the TV have smart tv\n0 - No\n1 - Yes");
+        scanf_s("%f", &structure[i].smart_TV);
+    }
+}
+
+void print_struct(TV *structure, int size)
+{
+    rewind(stdin);
+    for (int i = 0; i < size; ++i)
+    {
+        printf("\nName is: %s", structure[i].name);
+        printf("\nResolution is: %d x %d", structure[i].resolution.w, structure[i].resolution.h);
+        printf("\nNumber of hdmi ports is: %d", structure[i].number_of_hdmi);
+        printf("\nPanel thickness is: %1.3f", structure[i].panel_thickness);
+        if(structure[i].smart_TV == 1 )
+            printf("\nSmart TV allowed.\n");
+        else
+            printf("\nSmart TV not allowed.\n");
+    }
+}
+
+void sort_by_name(TV *structure, int size)
+{
+
+}
+
+void sort_by_resolution(TV *structure, int size)
+{
+
+}
+
+void number_of_hdmi(TV *structure, int size)
+{
+
+}
+
+void sort_by_panel_thickness(TV *structure, int size)
+{
+
+}
+
+void sort_by_avail_of_stv(TV *structure, int size)
+{
+
 }
