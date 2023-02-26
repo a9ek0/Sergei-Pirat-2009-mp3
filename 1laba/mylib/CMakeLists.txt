@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 2.4)
+project(mylib)
+
+# Add all source files
+file(GLOB SOURCES "src/*.c")
+
+# Create a static library from the sources
+add_library(mylib STATIC ${SOURCES})
+
+# Specify the directories in which to search for headers
+target_include_directories(mylib PUBLIC include)
