@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(mylib)
 
 # Add all source files
-set(source_files src/structure.c)
+file(GLOB SOURCES "src/*.c")
 
 # Create a static library from the sources
 add_library(mylib STATIC ${SOURCES})
