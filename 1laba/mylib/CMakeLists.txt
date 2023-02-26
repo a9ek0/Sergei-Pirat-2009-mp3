@@ -5,7 +5,7 @@ project(mylib)
 file(GLOB SOURCES "src/*.c")
 
 # Create a static library from the sources
-add_library(mylib STATIC ${SOURCES})
+add_library(mylib STATIC structure.c)
 
 # Specify the directories in which to search for headers
 target_include_directories(mylib PUBLIC include)
