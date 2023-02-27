@@ -1,10 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
+#include <wchar.h>
+#include <locale.h>
 #define SWAP(A, B) { int t = A; A = B; B = t; }
 #define SWAP_FLT(A, B) { float t = A; A = B; B = t; }
 #define SWAP_STR(A, B) { char t[50]; strcpy(t, A); strcpy(A, B); strcpy(B, t); }
 #define COMPARE(A, B, C) {if(A > B) C = 1; else C = 0;}
+
+
+/*▀▄▀▄▀▄▀▄▀▄[̲̲̅̅т̲̲̅̅а̲̲̅̅к̲̲̅̅с̲̲̅̅и̲̲̅̅с̲̲̅̅т̲̲̅̅]▄▀▄▀▄▀▄▀▄▀*/
+/*٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*/
+/*[̲̅0̲̅][̲̅0̲̅][̲̅7̲̅]░J░a░m░e░s░ ░B░o░n░d░(⌐■_■)--︻╦╤─ - - -*/
 
 enum smart_tv{
     AVAILABLE,
@@ -35,54 +43,98 @@ void sort_by_avail_of_stv(TV *structure, int size);
 void check_in_range(int *value, int left_boarder, int right_boarder);
 void dell_struct(TV *structure, int *size);
 void double_sort(TV *structure, int num_of_elements);
-void param_sort(TV *structure, int num_of_elements, int first, int const second);
-void check_same(int *first_number, int *second_number);
-
+void param_sort(TV *structure, int num_of_elements, int first, const int second);
+void check_same(int *first_number, const int *second_number);
+void menu(TV *structure, int size);
 
 int main() {
+    SetConsoleCP(65001);
+    SetConsoleOutputCP(65001);
     TV *tv;
     int size = 0;
-    create_struct_arr(&tv, &size);
-    initiate_struct(tv, size);
-    print_struct(tv, size);
-    dell_struct(tv, &size);
-    print_struct(tv, size);
-    /////free nado, DELL
-    free(tv);
+    menu(tv, size);
     return 0;
 }
 
 void menu(TV *structure, int size)
 {
-    for (int i = 1; i < size; ++i)
+    int index = 0;
+    int k = 0;
+    while(k != 3)
     {
-        for (int j = 0; j < size - 1; ++j)
-        {
-            if((structure[j].resolution.w * structure[j].resolution.h) < (structure[j + 1].resolution.w * structure[j].resolution.h))
+    printf("●▬▬▬▬▬▬▬▬▬▬▬▬⍝⍝⍝⍝⍝▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬●\n"
+                 "♕░░░░░░░░Я ПЕРСОН  ░V░I░P░  ТЫ ПАЦАН ВЛИП░░░░░░░░░♕\n"
+                 "●▬▬▬▬▬▬▬▬▬▬▬▬⍝⍝⍝⍝⍝▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬●");
+    printf("\n1.Initiate structure array.\n"
+           "2.Enter structure array.\n"
+           "3.Sort structure.\n"
+           "4.Print structures.\n"
+           "5.Delete structure from array.\n"
+           "6.Exit.\n");
+    fflush(stdin);
+    scanf_s("%d", &index);
+    switch (index)
+    {
+        case 1:
+            create_struct_arr(&structure, &size);
+            k = 1;
+            break;
+        case 2:
+            if(k != 1 )
             {
-                SWAP_STR(structure[j].name, structure[j + 1].name)
-                SWAP(structure[j].resolution.w, structure[j + 1].resolution.w)
-                SWAP(structure[j].resolution.h, structure[j + 1].resolution.h)
-                SWAP(structure[j].number_of_hdmi, structure[j + 1].number_of_hdmi)
-                SWAP_FLT(structure[j].panel_thickness, structure[j + 1].panel_thickness)
-                SWAP(structure[j].smart_TV, structure[j + 1].smart_TV)
+                printf("You didn't create an array.\n");
+                break;
             }
+            initiate_struct(structure, size);
+            k = 2;
+            break;
+        case 3:
+            if(k != 2)
+            {
+                printf("You didn't fill/create an array.\n");
+                break;
+            }
+            double_sort(structure, size);
+            break;
+        case 4:
+            if(k != 2)
+            {
+                printf("You didn't fill/create an array.\n");
+                break;
+            }
+            print_struct(structure, size);
+            break;
+        case 5:
+        {
+            if(k != 2)
+            {
+                printf("You didn't fill/create an array.\n");
+                break;
+            }
+            dell_struct(structure, &size);
+            break;
         }
+        case 6:
+            k = 3;
+            break;
+        default:
+            printf("Wrong input!");
+            break;
+    }
     }
 }
 
 void dell_struct(TV *structure, int *size)
 {
-    int dell = 0;
+    int *dell;
     int index = *size;
     printf("\nChoose TV that you want to delete.\n");
     for (int k = 0; k < index; k++)
     {
         printf("%d: %s\n", k, structure[k].name);
     }
-    check_in_range(&dell, 0, index);
-
-    for (int j = dell; j < index - 1; ++j)
+    check_in_range(dell, 0, index - 1);
+    for (int j = *dell; j < index - 1; j++)
     {
         structure[j] = structure[j + 1];
     }
@@ -234,7 +286,7 @@ void sort_by_avail_of_stv(TV *structure, int size)
 
 void check_in_range(int *value, int left_boarder, int right_boarder)
 {
-    while (scanf_s("%d", value) == 0 || getchar() !='\n' || *value > right_boarder || *value < left_boarder)
+    while (scanf_s("%d", value) == 0 || getchar() !='\n' || *value > left_boarder || *value < right_boarder)
     {
         printf("Wrong input");
         rewind(stdin);
@@ -281,7 +333,7 @@ void double_sort(TV *structure, int num_of_elements)
     param_sort(structure, num_of_elements, first, second);
 }
 
-void param_sort(TV *structure, int num_of_elements, int first, int const second)
+void param_sort(TV *structure, int num_of_elements, int first, const int second)
 {
     int arr[6];
     for (int i = 1; i < num_of_elements; ++i)
@@ -307,7 +359,7 @@ void param_sort(TV *structure, int num_of_elements, int first, int const second)
     }
 }
 
-void check_same(int *first_number, int *second_number) {
+void check_same(int *first_number, const int *second_number) {
     if(*first_number == *second_number)
     {
         printf("You have chosen the same options! Please choose another option");
