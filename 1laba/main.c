@@ -4,6 +4,7 @@
 #define SWAP(A, B) { int t = A; A = B; B = t; }
 #define SWAP_FLT(A, B) { float t = A; A = B; B = t; }
 #define SWAP_STR(A, B) { char t[50]; strcpy(t, A); strcpy(A, B); strcpy(B, t); }
+#define COMPARE(A, B, C) {if(A > B) C = 1; else C = 0;}
 
 enum smart_tv{
     AVAILABLE,
@@ -33,6 +34,10 @@ void sort_by_panel_thickness(TV *structure, int size);
 void sort_by_avail_of_stv(TV *structure, int size);
 void check_in_range(int *value, int left_boarder, int right_boarder);
 void dell_struct(TV *structure, int *size);
+void double_sort(TV *structure, int num_of_elements);
+void param_sort(TV *structure, int num_of_elements, int first, int const second);
+void check_same(int *first_number, int *second_number);
+
 
 int main() {
     TV *tv;
@@ -42,7 +47,7 @@ int main() {
     print_struct(tv, size);
     dell_struct(tv, &size);
     print_struct(tv, size);
-    /////free nado
+    /////free nado, DELL
     free(tv);
     return 0;
 }
@@ -82,6 +87,7 @@ void dell_struct(TV *structure, int *size)
         structure[j] = structure[j + 1];
     }
     (*size)--;
+
 }
 
 
@@ -232,5 +238,82 @@ void check_in_range(int *value, int left_boarder, int right_boarder)
     {
         printf("Wrong input");
         rewind(stdin);
+    }
+}
+
+void double_sort(TV *structure, int num_of_elements)
+{
+    int first;
+    int second;
+    int cnt = 0;
+    while(cnt != 2) {
+        printf("\nChoose sorting field.\n 1.Sort by name.\n 2.Sort by resolution."
+               "\n 3.Sort by number of hdmi\n 4.Sort by panel thickness\n 5.Sort by available of Smart TV\n");
+        if(cnt == 1)
+        {
+            check_in_range(&second, 0, 5);
+            check_same(&second, &first);
+        }
+        else
+            check_in_range(&first, 0, 5);
+
+        switch (first) {
+            case 1:
+                sort_by_name(structure, num_of_elements);
+                break;
+            case 2:
+                sort_by_resolution(structure, num_of_elements);
+                break;
+            case 3:
+                sort_by_number_of_hdmi(structure, num_of_elements);
+                break;
+            case 4:
+                sort_by_panel_thickness(structure, num_of_elements);
+                break;
+            case 5:
+                sort_by_avail_of_stv(structure, num_of_elements);
+                break;
+            default:
+                break;
+        }
+        cnt++;
+    }
+    param_sort(structure, num_of_elements, first, second);
+}
+
+void param_sort(TV *structure, int num_of_elements, int first, int const second)
+{
+    int arr[6];
+    for (int i = 1; i < num_of_elements; ++i)
+    {
+        for (int j = 0; j < num_of_elements - 1; ++j)
+        {
+            //////////////////////float
+            COMPARE(structure[j].panel_thickness, structure[j + 1].panel_thickness, arr[4])
+            COMPARE(structure[j].smart_TV, structure[j + 1].smart_TV, arr[5])
+            COMPARE(structure[j].number_of_hdmi, structure[j + 1].number_of_hdmi, arr[3])
+            COMPARE(structure[j].resolution.w * structure[j].resolution.h, structure[j + 1].resolution.w * structure[j + 1].resolution.h, arr[2])
+            arr[1] = strcmp(structure[j].name, structure[j + 1].name);
+            if(arr[first] > 0 && arr[second] > 0)
+            {
+                SWAP_STR(structure[j].name, structure[j + 1].name)
+                SWAP(structure[j].resolution.w, structure[j + 1].resolution.w)
+                SWAP(structure[j].resolution.h, structure[j + 1].resolution.h)
+                SWAP(structure[j].number_of_hdmi, structure[j + 1].number_of_hdmi)
+                SWAP_FLT(structure[j].panel_thickness, structure[j + 1].panel_thickness)
+                SWAP(structure[j].smart_TV, structure[j + 1].smart_TV)
+            }
+        }
+    }
+}
+
+void check_same(int *first_number, int *second_number) {
+    if(*first_number == *second_number)
+    {
+        printf("You have chosen the same options! Please choose another option");
+        while (scanf_s("%d", first_number) == 0 || getchar() != '\n' || *first_number > 3 || *first_number == *second_number) {
+            printf("You have chosen the same options! Please choose another option");
+            rewind(stdin);
+        }
     }
 }
