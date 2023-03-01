@@ -43,16 +43,22 @@ void sort_by_avail_of_stv(TV *structure, int size);
 void check_in_range(int *value, int left_boarder, int right_boarder);
 void dell_struct(TV *structure, int *size);
 void double_sort(TV *structure, int num_of_elements);
+void single_sort(TV *structure, int num_of_elements);
 void param_sort(TV *structure, int num_of_elements, int first, int second);
 void check_same(int *first_number, const int *second_number);
 void menu(TV *structure, int size);
 void parce(TV *structure);
 void sort_TV(TV *structure, int num_tvs, int sort_field_1, int sort_field_2);
+int compare_resolution_desc(const TV *tv1, const TV *tv2);
+int compare_name_asc(const TV *tv1, const TV *tv2);
+void sort_tvs(TV *tvs, int num_tvs, int compare1, int compare2);
+void free_struct(TV *structure, int size);
 
 int main() {
     SetConsoleCP(65001);
     SetConsoleOutputCP(65001);
     TV *tv;
+    typedef int (*compare_func_t)(const TV *, const TV *);
     int size = 0;
     menu(tv, size);
     printf("\n⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠛⠛⠉⠉⠉⠋⠛⠛⠛⠻⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
@@ -100,16 +106,15 @@ void menu(TV *structure, int size)
     int k = 0;
     while(k != 3)
     {
-    printf("●▬▬▬▬▬▬▬▬▬▬▬▬⍝⍝⍝⍝⍝▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬●\n"
-                 "♕░░░░░░░░Я ПЕРСОН  ░V░I░P░  ТЫ ПАЦАН ВЛИП░░░░░░░░░♕\n"
-                 "●▬▬▬▬▬▬▬▬▬▬▬▬⍝⍝⍝⍝⍝▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬●");
+    printf("٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*");
     printf("\n1.Initiate structure array.\n"
            "2.Enter structure array.\n"
-           "3.Sort structure.\n"
+           "3.Double sort structure.\n"
            "4.Print structures.\n"
            "5.Delete structure from array.\n"
            "6.Parce.\n"
-           "7.Exit.\n");
+           "7.Single sort structure.\n"
+           "8.Exit.\n");
     fflush(stdin);
     scanf_s("%d", &index);
     switch (index)
@@ -161,6 +166,14 @@ void menu(TV *structure, int size)
             size = 61;
             break;
         case 7:
+            if(k != 2)
+            {
+                printf("You didn't fill/create an array.\n");
+                break;
+            }
+            single_sort(structure, size);
+            break;
+        case 8:
             k = 3;
             break;
         default:
@@ -168,6 +181,7 @@ void menu(TV *structure, int size)
             break;
     }
     }
+    free_struct(structure, size);
 }
 
 
@@ -185,8 +199,10 @@ void dell_struct(TV *structure, int *size)
     {
         structure[j] = structure[j + 1];
     }
+    free(structure[*size - 1].name);
+    free(&structure[*size - 1]);
     (*size)--;
-
+    structure = (TV*)realloc(structure, *size * sizeof (TV));
 }
 
 void create_struct_arr(TV **structure, int *size)
@@ -340,22 +356,11 @@ void check_in_range(int *value, int left_boarder, int right_boarder)
     }
 }
 
-void double_sort(TV *structure, int num_of_elements)
-{
+void single_sort(TV *structure, int num_of_elements) {
     int first;
-    int second;
-    int cnt = 0;
-    while(cnt != 2) {
         printf("\nChoose sorting field.\n 1.Sort by name.\n 2.Sort by resolution."
                "\n 3.Sort by number of hdmi\n 4.Sort by price\n 5.Sort by available of Smart TV\n");
-        if(cnt == 1)
-        {
-            check_in_range(&second, 1, 5);
-            check_same(&second, &first);
-        }
-        else
             check_in_range(&first, 1, 5);
-
         switch (first) {
             case 1:
                 sort_by_name(structure, num_of_elements);
@@ -373,112 +378,53 @@ void double_sort(TV *structure, int num_of_elements)
                 sort_by_avail_of_stv(structure, num_of_elements);
                 break;
             default:
+                printf("Wrong input!");
                 break;
         }
+}
+
+void double_sort(TV *structure, int num_of_elements)
+{
+    int first;
+    int second;
+    int cnt = 0;
+    while(cnt != 2) {
+        printf("\nChoose sorting field.\n 1.Sort by name.\n 2.Sort by resolution."
+               "\n 3.Sort by number of hdmi\n 4.Sort by price\n 5.Sort by available of Smart TV\n");
+        if(cnt == 1)
+        {
+            check_in_range(&second, 1, 5);
+            check_same(&second, &first);
+        }
+        else
+            check_in_range(&first, 1, 5);
         cnt++;
     }
-    //sort_TV(structure, num_of_elements, first, second);
     param_sort(structure, num_of_elements, first, second);
 }
 
 void param_sort(TV *structure, int num_of_elements, int first, const int second)
 {
     TV temp;
-    int arr[6];
+    int arr[7];
     for (int i = 0; i < num_of_elements; ++i)
     {
         for (int j = i + 1; j < num_of_elements - 1; ++j)
         {
-            COMPARE(structure[i].price, structure[j].price, arr[4])
-            COMPARE(structure[i].smart_TV, structure[j].smart_TV, arr[5])
-            COMPARE(structure[i].number_of_hdmi, structure[j].number_of_hdmi, arr[3])
-            COMPARE(structure[i].resolution.w * structure[i].resolution.h, structure[j].resolution.w * structure[j].resolution.h, arr[2])
-            if((int)structure[i].name[0] > (int)structure[j].name[0]) arr[1] = 1; else arr[1] = 0;
-            //COMPARE_STR(structure[j].name[0], structure[j + 1].name[0], arr[1])
-            //arr[1] = strcmp(structure[j].name, structure[j + 1].name);
-            if(arr[first] == 0 && arr[second] != 0)
+            COMPARE(structure[j].price, structure[j + 1].price, arr[4])
+            COMPARE(structure[j].smart_TV, structure[j + 1].smart_TV, arr[5])
+            COMPARE(structure[j].number_of_hdmi, structure[j + 1].number_of_hdmi, arr[3])
+            COMPARE(structure[j].resolution.w * structure[i + 1].resolution.h, structure[j].resolution.w * structure[j].resolution.h, arr[2])
+            arr[1] = strcmp(structure[j].name, structure[j + 1].name);
+            if(arr[first] > 0 && arr[second] > 0)
             {
-                SWAP_STR(structure[i].name, structure[j].name)
-                SWAP(structure[i].resolution.w, structure[j].resolution.w)
-                SWAP(structure[i].resolution.h, structure[j].resolution.h)
-                SWAP(structure[i].number_of_hdmi, structure[j].number_of_hdmi)
-                SWAP_FLT(structure[i].price, structure[j].price)
-                SWAP(structure[i].smart_TV, structure[j].smart_TV)
+                temp = structure[j];
+                structure[j] = structure[j + 1];
+                structure[j + 1] = temp;
             }
         }
     }
 }
-
-void sort_TV(TV *structure, int num_tvs, int sort_field_1, int sort_field_2) {
-    int i;
-    int j;
-    TV temp;
-    for (i = 0; i < num_tvs; i++) {
-        for (j = i + 1; j < num_tvs; j++) {
-            int cmp = 0;
-            switch (sort_field_1) {
-                case 1:
-                    cmp = strcmp(structure[i].name, structure[j].name);
-                    break;
-                case 2:
-                    if (structure[i].resolution.w != structure[j].resolution.w) {
-                        cmp = structure[i].resolution.w - structure[j].resolution.w;
-                    } else {
-                        cmp = structure[i].resolution.h - structure[j].resolution.h;
-                    }
-                    break;
-                case 3:
-                    cmp = structure[i].number_of_hdmi - structure[j].number_of_hdmi;
-                    break;
-                case 4:
-                    cmp = structure[i].price - structure[j].price;
-                    break;
-                case 5:
-                    cmp = structure[i].smart_TV - structure[j].smart_TV;
-                    break;
-                default:
-                    break;
-            }
-
-            if (cmp > 0 || (cmp == 0 && sort_field_2 != 0)) {
-                if (sort_field_2 != 0) {
-                    switch (sort_field_2) {
-                        case 1:
-                            cmp = strcmp(structure[i].name, structure[j].name);
-                            break;
-                        case 2:
-                            if (structure[i].resolution.w != structure[j].resolution.w) {
-                                cmp = structure[i].resolution.w - structure[j].resolution.w;
-                            } else {
-                                cmp = structure[i].resolution.h - structure[j].resolution.h;
-                            }
-                            break;
-                        case 3:
-                            cmp = structure[i].number_of_hdmi - structure[j].number_of_hdmi;
-                            break;
-                        case 4:
-                            cmp = structure[i].price - structure[j].price;
-                            break;
-                        case 5:
-                            cmp = structure[i].smart_TV - structure[j].smart_TV;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                if (cmp > 0) {
-                    SWAP_STR(structure[i].name, structure[j].name)
-                    SWAP(structure[i].resolution.w, structure[j].resolution.w)
-                    SWAP(structure[i].resolution.h, structure[j].resolution.h)
-                    SWAP(structure[i].number_of_hdmi, structure[j].number_of_hdmi)
-                    SWAP_FLT(structure[i].price, structure[j].price)
-                    SWAP(structure[i].smart_TV, structure[j].smart_TV)
-                }
-            }
-        }
-    }
-}
-
 
 void check_same(int *first_number, const int *second_number) {
     if(*first_number == *second_number)
@@ -511,28 +457,28 @@ void parce(TV *structure)
     int k = 0;
 ////////////////////////////////////////NAME
     while(!feof(f)) {
-        c = fgetc(f);
+        c = (char)fgetc(f);
 
 
         if (c == NAME[0]) {
-            c = fgetc(f);
+            c = (char)fgetc(f);
             while (c == NAME[i])
             {
                 i++;
-                c = fgetc(f);
+                c = (char)fgetc(f);
             }
         }
 
 
         if(i == strlen(NAME))
         {
-            c = fgetc(f);
+            c = (char)fgetc(f);
             structure[j].name = (char*) malloc(1);
             while(c != '-')
             {
                 structure[j].name = (char*) realloc(structure[j].name, (k + 1));
                 structure[j].name[k] = c;
-                c = fgetc(f);
+                c = (char)fgetc(f);
                 k++;
             }
             structure[j].name = (char*) realloc(structure[j].name, k);
@@ -554,15 +500,15 @@ void parce(TV *structure)
 ////////////////////////////////////////////HDMI
     f = fopen("parce.txt", "rt+");
     while(!feof(f)) {
-        c = fgetc(f);
+        c = (char)fgetc(f);
 
 
         if (c == HDMI[0]) {
-            c = fgetc(f);
+            c = (char)fgetc(f);
             while (c == HDMI[i])
             {
                 i++;
-                c = fgetc(f);
+                c = (char)fgetc(f);
             }
         }
 
@@ -570,10 +516,10 @@ void parce(TV *structure)
         if(i == strlen(HDMI))
         {
             structure[j].number_of_hdmi = 0;
-            c = fgetc(f);
+            c = (char)fgetc(f);
             while((int)c > 57 || (int)c < 48)
             {
-                c = fgetc(f);
+                c = (char)fgetc(f);
             }
             structure[j].number_of_hdmi = atoi(&c);
         }
@@ -593,14 +539,14 @@ void parce(TV *structure)
 //////////////////////////////////////////PRICE
     f = fopen("parce.txt", "rt+");
     while(!feof(f)) {
-        c = fgetc(f);
+        c = (char)fgetc(f);
 
         if (c == PRICE[0]) {
-            c = fgetc(f);
+            c = (char)fgetc(f);
             while (c == PRICE[i])
             {
                 i++;
-                c = fgetc(f);
+                c = (char)fgetc(f);
             }
         }
 
@@ -625,17 +571,17 @@ void parce(TV *structure)
 ///////////////////////////////////////////////////////////SMART TV
     f = fopen("parce.txt", "rt+");
     while(!feof(f)) {
-        c = fgetc(f);
+        c = (char)fgetc(f);
 
         if (c == SMART_TV[0]) {
-            c = fgetc(f);
+            c = (char)fgetc(f);
             while (c == SMART_TV[i])
             {
                 i++;
-                c = fgetc(f);
+                c = (char)fgetc(f);
             }
-            c = fgetc(f);
-            c = fgetc(f);
+            c = (char)fgetc(f);
+            c = (char)fgetc(f);
         }
 
         if(i == strlen(SMART_TV))
@@ -661,21 +607,21 @@ void parce(TV *structure)
 ////////////////////////////////////RESOLUTION
     f = fopen("parce.txt", "rt+");
     while(!feof(f)) {
-        c = fgetc(f);
+        c = (char)fgetc(f);
 
         if (c == RESOLUTION[0]) {
-            c = fgetc(f);
+            c = (char)fgetc(f);
             while (c == RESOLUTION[i])
             {
                 i++;
-                c = fgetc(f);
+                c = (char)fgetc(f);
             }
         }
 
         if(i == strlen(RESOLUTION))
         {
             fscanf(f, "%d", &structure[j].resolution.w);
-            c = fgetc(f);
+            c = (char)fgetc(f);
             fscanf(f, "%d", &structure[j].resolution.h);
         }
         else
@@ -687,4 +633,14 @@ void parce(TV *structure)
         i = 1;
     }
     fclose(f);
+}
+
+
+void free_struct(TV *structure, int size)
+{
+    for (int i = 0; i < size; ++i)
+    {
+        free(structure[i].name);
+        free(&structure[i]);
+    }
 }
