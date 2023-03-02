@@ -3,13 +3,6 @@
 #include <string.h>
 #include <windows.h>
 #include <wchar.h>
-#include <locale.h>
-#define SWAP(A, B) { int t = A; A = B; B = t; }
-#define SWAP_FLT(A, B) { float t = A; A = B; B = t; }
-#define SWAP_STR(A, B) { char t[50]; strcpy(t, A); strcpy(A, B); strcpy(B, t); }
-#define COMPARE(A, B, C) {if(A >= B) C = 1; else C = 0;}
-#define COMPARE_STR(A, B, C) {if((int)A > (int)B) C = 1; else C = 0;}
-
 /*▀▄▀▄▀▄▀▄▀▄[̲̲̅̅т̲̲̅̅а̲̲̅̅к̲̲̅̅с̲̲̅̅и̲̲̅̅с̲̲̅̅т̲̲̅̅]▄▀▄▀▄▀▄▀▄▀*/
 /*٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*/
 /*[̲̅0̲̅][̲̅0̲̅][̲̅7̲̅]░J░a░m░e░s░ ░B░o░n░d░(⌐■_■)--︻╦╤─ - - -*/
@@ -39,7 +32,6 @@ void check_in_range(int *value, int left_boarder, int right_boarder);
 void dell_struct(TV *structure, int *size);
 void double_sort(TV *structure, int num_of_elements);
 void single_sort(TV *structure, int num_of_elements);
-void param_sort(TV *structure, int num_of_elements, int first, int second);
 void check_same(int *first_number, const int *second_number);
 void menu(TV *structure, int size);
 void parce(TV *structure);
@@ -54,8 +46,16 @@ int compare_number_of_hdmi(const void *p1, const void *p2);
 int compare_resolution(const void *p1, const void *p2);
 int compare_name(const void *p1, const void *p2);
 int compare_by_two_param(const void *p1, const void *p2);
+/////////////////////compare by two
 int compare_by_name_res(const void *p1, const void *p2);
-int compare_tv(const void *p1, const void *p2);
+int compare_by_name_hdmi(const void *p1, const void *p2);
+int compare_by_name_price(const void *p1, const void *p2);
+int compare_by_price_smart_tv(const void *p1, const void *p2);
+int compare_by_name_smart_tv(const void *p1, const void *p2);
+int compare_by_hdmi_smart_tv(const void *p1, const void *p2);
+int compare_by_hdmi_price(const void *p1, const void *p2);
+
+
 int main() {
     SetConsoleCP(65001);
     SetConsoleOutputCP(65001);
@@ -223,7 +223,6 @@ void initiate_struct(TV *structure, int size)
         printf("\nEnter Name\n");
         scanf_s("%s", buffer);
         structure[i].name = (char *) calloc(strlen(buffer) + 1, sizeof(char));
-        //structure[i].name[buffer + 1] = '\n';
         strcpy(structure[i].name, buffer);
         fflush(stdin);
         printf("\nEnter width of screen\n");
@@ -300,46 +299,44 @@ void double_sort(TV *structure, int num_of_elements)
     switch (index) {
         case 1:
         ///name + res
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
         break;
         case 2:
         ///name + hdmi
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_hdmi);
+            break;
         case 3:
         ///name + price
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_price);
+            break;
         case 4:
         ///name + smart_tv
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_smart_tv);
+            break;
         case 5:
         ///res + hdmi
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
+            break;
         case 6:
         ///res + price
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
+            break;
         case 7:
         ///res + smart_tv
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
+            break;
         case 8:
         ///hdmi + price
+            qsort(structure, num_of_elements, sizeof(TV), compare_by_hdmi_price);
         break;
         case 9:
         ///hdmi + smart_tv
-        break;
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_hdmi_smart_tv);
+            break;
         case 10:
         ///price + smart_tv
-            qsort(structure, num_of_elements, sizeof(TV), compare_tv);
+            qsort(structure, num_of_elements, sizeof (TV), compare_by_price_smart_tv);
             break;
-    }
-}
-
-void check_same(int *first_number, const int *second_number) {
-    if(*first_number == *second_number)
-    {
-        printf("You have chosen the same options! Please choose another option");
-        while (scanf_s("%d", first_number) == 0 || getchar() != '\n' || *first_number > 3 || *first_number == *second_number) {
-            printf("You have chosen the same options! Please choose another option");
-            rewind(stdin);
-        }
     }
 }
 
@@ -567,6 +564,10 @@ int compare_resolution(const void *p1, const void *p2) {
         return -1;
     } else if (tv1->resolution.w > tv2->resolution.w) {
         return 1;
+    } else if (tv1->resolution.h < tv2->resolution.h) {
+        return -1;
+    } else if (tv1->resolution.h > tv2->resolution.h) {
+        return 1;
     } else {
         return 0;
     }
@@ -616,9 +617,13 @@ int compare_by_name_res(const void *p1, const void *p2) {
     } else if (tv1->name > tv2->name) {
         return 1;
     } else {
-        if ((tv1->resolution.w * tv1->resolution.h) < (tv2->resolution.w * tv2->resolution.h)) {
+        if (tv1->resolution.w < tv2->resolution.w) {
             return -1;
-        } else if ((tv1->resolution.w * tv1->resolution.h) > (tv2->resolution.w * tv2->resolution.h)) {
+        } else if (tv1->resolution.w > tv2->resolution.w) {
+            return 1;
+        } else if (tv1->resolution.h < tv2->resolution.h) {
+            return -1;
+        } else if (tv1->resolution.h > tv2->resolution.h) {
             return 1;
         } else {
             return 0;
@@ -626,13 +631,12 @@ int compare_by_name_res(const void *p1, const void *p2) {
     }
 }
 
-
-int compare_tv(const void *p1, const void *p2) {
+int compare_by_name_hdmi(const void *p1, const void *p2) {
     const TV *tv1 = p1;
     const TV *tv2 = p2;
-    if (tv1->price < tv2->price) {
+    if (tv1->name < tv2->name) {
         return -1;
-    } else if (tv1->price > tv2->price) {
+    } else if (tv1->name > tv2->name) {
         return 1;
     } else {
         if (tv1->number_of_hdmi < tv2->number_of_hdmi) {
@@ -645,45 +649,91 @@ int compare_tv(const void *p1, const void *p2) {
     }
 }
 
-int compare_by_(const void *p1, const void *p2) {
+int compare_by_name_price(const void *p1, const void *p2) {
     const TV *tv1 = p1;
     const TV *tv2 = p2;
     if (tv1->name < tv2->name) {
         return -1;
-    }
-    else if (tv1->name > tv2->name) {
+    } else if (tv1->name > tv2->name) {
         return 1;
-    }
-    else {
-        if (tv1->resolution.w < tv2->resolution.w) {
+    } else {
+        if (tv1->price < tv2->price) {
             return -1;
-        }
-        else if (tv1->resolution.w > tv2->resolution.w) {
+        } else if (tv1->price > tv2->price) {
             return 1;
-        }
-        else {
+        } else {
             return 0;
         }
     }
 }
 
-int compare_by_two_(const void *p1, const void *p2) {
+int compare_by_name_smart_tv(const void *p1, const void *p2) {
     const TV *tv1 = p1;
     const TV *tv2 = p2;
     if (tv1->name < tv2->name) {
         return -1;
-    }
-    else if (tv1->name > tv2->name) {
+    } else if (tv1->name > tv2->name) {
         return 1;
-    }
-    else {
-        if (tv1->resolution.w < tv2->resolution.w) {
+    } else {
+        if (tv1->smart_TV < tv2->smart_TV) {
             return -1;
-        }
-        else if (tv1->resolution.w > tv2->resolution.w) {
+        } else if (tv1->smart_TV > tv2->smart_TV) {
             return 1;
+        } else {
+            return 0;
         }
-        else {
+    }
+}
+
+int compare_by_price_smart_tv(const void *p1, const void *p2) {
+    const TV *tv1 = p1;
+    const TV *tv2 = p2;
+    if (tv1->price < tv2->price) {
+        return -1;
+    } else if (tv1->price > tv2->price) {
+        return 1;
+    } else {
+        if (tv1->smart_TV < tv2->smart_TV) {
+            return -1;
+        } else if (tv1->smart_TV > tv2->smart_TV) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+int compare_by_hdmi_smart_tv(const void *p1, const void *p2) {
+    const TV *tv1 = p1;
+    const TV *tv2 = p2;
+    if (tv1->number_of_hdmi < tv2->number_of_hdmi) {
+        return -1;
+    } else if (tv1->number_of_hdmi > tv2->number_of_hdmi) {
+        return 1;
+    } else {
+        if (tv1->smart_TV < tv2->smart_TV) {
+            return -1;
+        } else if (tv1->smart_TV > tv2->smart_TV) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+int compare_by_hdmi_price(const void *p1, const void *p2) {
+    const TV *tv1 = p1;
+    const TV *tv2 = p2;
+    if (tv1->number_of_hdmi < tv2->number_of_hdmi) {
+        return -1;
+    } else if (tv1->number_of_hdmi > tv2->number_of_hdmi) {
+        return 1;
+    } else {
+        if (tv1->price < tv2->price) {
+            return -1;
+        } else if (tv1->price > tv2->price) {
+            return 1;
+        } else {
             return 0;
         }
     }
