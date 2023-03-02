@@ -223,6 +223,7 @@ void initiate_struct(TV *structure, int size)
         printf("\nEnter Name\n");
         scanf_s("%s", buffer);
         structure[i].name = (char *) calloc(strlen(buffer) + 1, sizeof(char));
+        //structure[i].name[buffer + 1] = '\n';
         strcpy(structure[i].name, buffer);
         fflush(stdin);
         printf("\nEnter width of screen\n");
@@ -240,9 +241,9 @@ void initiate_struct(TV *structure, int size)
 
 void print_struct(TV *structure, int size)
 {
-    rewind(stdin);
     for (int i = 0; i < size; ++i)
     {
+        rewind(stdout);
         printf("\nName is: %s", structure[i].name);
         printf("\nResolution is: %d x %d", structure[i].resolution.w, structure[i].resolution.h);
         printf("\nNumber of hdmi ports is: %d", structure[i].number_of_hdmi);
@@ -329,30 +330,6 @@ void double_sort(TV *structure, int num_of_elements)
             qsort(structure, num_of_elements, sizeof(TV), compare_tv);
             break;
     }
-    //param_sort(structure, num_of_elements, first, second);
-}
-
-void param_sort(TV *structure, int num_of_elements, int first, const int second)
-{
-    TV temp;
-    int arr[7];
-    for (int i = 0; i < num_of_elements; ++i)
-    {
-        for (int j = i + 1; j < num_of_elements - 1; ++j)
-        {
-            qsort(structure, num_of_elements, sizeof (TV), compare_name);
-            qsort(structure, num_of_elements, sizeof (TV), compare_resolution);
-            qsort(structure, num_of_elements, sizeof (TV), compare_number_of_hdmi);
-            qsort(structure, num_of_elements, sizeof (TV), compare_price);
-            qsort(structure, num_of_elements, sizeof (TV), compare_smart_TV);
-            if(arr[first] > 0 && arr[second] > 0)
-            {
-                temp = structure[j];
-                structure[j] = structure[j + 1];
-                structure[j + 1] = temp;
-            }
-        }
-    }
 }
 
 void check_same(int *first_number, const int *second_number) {
@@ -374,7 +351,11 @@ void parce(TV *structure)
     ///HDMI --- Количество HDMI</td><td class='result__attr_val  cr-result__attr_odd'>
     ///PRICE --- data-price="
     FILE *f;
-    f = fopen("parce.txt", "rt+");
+    if ((f = fopen("parce.txt", "r")) == NULL)
+    {
+        printf("Открыть файл не удалось\n");
+        exit(1);
+    }
     char c;
     char NAME[24] = "alt=\"Телевизор"; ///-
     char PRICE[13] = "data-price="; ///"
@@ -398,9 +379,9 @@ void parce(TV *structure)
             }
         }
 
-
         if(i == strlen(NAME))
         {
+            k = 0;
             c = (char)fgetc(f);
             structure[j].name = (char*) malloc(1);
             while(c != '-')
@@ -410,8 +391,7 @@ void parce(TV *structure)
                 c = (char)fgetc(f);
                 k++;
             }
-            structure[j].name = (char*) realloc(structure[j].name, k);
-            k = 0;
+            structure[j].name[k] = '\0';
         }
         else
         {
@@ -427,7 +407,7 @@ void parce(TV *structure)
     i = 1;
     fclose(f);
 ////////////////////////////////////////////HDMI
-    f = fopen("parce.txt", "rt+");
+    f = fopen("parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -466,7 +446,7 @@ void parce(TV *structure)
     j = 0;
     i = 1;
 //////////////////////////////////////////PRICE
-    f = fopen("parce.txt", "rt+");
+    f = fopen("parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -498,7 +478,7 @@ void parce(TV *structure)
     j = 0;
     i = 1;
 ///////////////////////////////////////////////////////////SMART TV
-    f = fopen("parce.txt", "rt+");
+    f = fopen("parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -534,7 +514,7 @@ void parce(TV *structure)
     j = 0;
     i = 1;
 ////////////////////////////////////RESOLUTION
-    f = fopen("parce.txt", "rt+");
+    f = fopen("parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
