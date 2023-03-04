@@ -31,6 +31,8 @@ void print_struct(TV *structure, int size);
 void print_name(TV *structure, int size);
 void check_in_range(int *value, int left_boarder, int right_boarder);
 void dell_struct(TV **structure, int *size);
+void remove_tv(TV **structure, int index, int *size);
+
 void double_sort(TV *structure, int num_of_elements);
 void single_sort(TV *structure, int num_of_elements);
 void check_same(int *first_number, const int *second_number);
@@ -165,7 +167,7 @@ void menu(TV *structure, int size)
                 printf("You didn't fill/create an array.\n");
                 break;
             }
-            dell_struct(structure, &size);
+            dell_struct(&structure, &size);
             break;
         }
         case 6:
@@ -196,7 +198,7 @@ void menu(TV *structure, int size)
             break;
     }
     }
-    //free_memory(structure, size);
+
 }
 
 
@@ -209,37 +211,40 @@ void dell_struct(TV **structure, int *size)
     int dell;
     int index = *size;
     printf("\nChoose TV that you want to delete.\n");
-    /*for (int k = 0; k < index; k++)
+    for (int k = 0; k < index; k++)
     {
         printf("%d: %s\n", k, (*structure)[k].name);
-    }*/
+    }
     check_in_range(&dell, 0, index - 1);
-    for (int j = dell; j < index - 1; j++)
-    {
-        (*structure)[j] = (*structure)[j + 1];
-    }
-    (*size)--;
-    free((*structure)[*size].name);
-    if (*size == 0) {
-        free(*structure);
-        *structure = NULL;
-        exit(0);
-    } else {
-        if (*structure != NULL) {
-            *structure = realloc(*structure, sizeof(TV) * (*size));
-            if (*structure == NULL) {
-                fprintf(stderr, "Failed to reallocate memory\n");
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
+    remove_tv(structure, dell, size);
 }
 
-void create_struct_arr(TV **structure, int *size)
-{
+void remove_tv(TV **structure, int index, int *size) {
+    if (index < 0 || index >= *size) {
+        printf("Error: index is out of bounds.\n");
+        return;
+    }
+    free((*structure)[index].name);
+    for (int i = index; i < *size - 1; i++) {
+        (*structure)[i] = (*structure)[i + 1];
+    }
+    *size -= 1;
+    TV *new_tvs = (TV*) realloc(*structure, *size * sizeof(TV));
+    if (new_tvs == NULL) {
+        printf("Error: memory reallocation failed.\n");
+        return;
+    }
+    *structure = new_tvs;
+}
+
+void create_struct_arr(TV **structure, int *size) {
     printf("Enter number of structures in array.\n");
     scanf_s("%d", size);
     *structure = (TV *) malloc(*size * sizeof(TV));
+    if (*structure == NULL) {
+        printf("Error: memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -525,8 +530,9 @@ void parce(TV *structure)
 
 void free_memory(TV *structure, int size) {
     for (int i = 0; i < size; i++) {
-        if(structure[i].name != NULL)
+        if (structure[i].name != NULL) {
             free(structure[i].name);
+        }
     }
     free(structure);
 }
