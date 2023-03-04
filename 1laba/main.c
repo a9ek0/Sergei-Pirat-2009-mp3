@@ -28,8 +28,9 @@ typedef struct{
 void create_struct_arr(TV **structure, int *size);
 void initiate_struct(TV *structure, int size);
 void print_struct(TV *structure, int size);
+void print_name(TV *structure, int size);
 void check_in_range(int *value, int left_boarder, int right_boarder);
-void dell_struct(TV *structure, int *size);
+void dell_struct(TV **structure, int *size);
 void double_sort(TV *structure, int num_of_elements);
 void single_sort(TV *structure, int num_of_elements);
 void check_same(int *first_number, const int *second_number);
@@ -39,7 +40,12 @@ void sort_TV(TV *structure, int num_tvs, int sort_field_1, int sort_field_2);
 int compare_resolution_desc(const TV *tv1, const TV *tv2);
 int compare_name_asc(const TV *tv1, const TV *tv2);
 void sort_tvs(TV *tvs, int num_tvs, int compare1, int compare2);
-void free_struct(TV *structure, int size);
+void free_memory(TV *structure, int size);
+/////////////////////////////////
+int compare(const TV *tv1,const TV *tv2, int sort_by);
+void sort(TV *tvs, int size, int sort_by);
+void d_sort(TV *tvs, int size, int field1, int field2);
+//////////////////////single comp
 int compare_smart_TV(const void *p1, const void *p2);
 int compare_price(const void *p1, const void *p2);
 int compare_number_of_hdmi(const void *p1, const void *p2);
@@ -60,7 +66,7 @@ int main() {
     SetConsoleCP(65001);
     SetConsoleOutputCP(65001);
     TV *tv;
-    typedef int (*compare_func_t)(const TV *, const TV *);
+    tv = (TV*) calloc(1, sizeof(TV));
     int size = 0;
     menu(tv, size);
     printf("\n⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠛⠛⠉⠉⠉⠋⠛⠛⠛⠻⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
@@ -98,6 +104,7 @@ int main() {
            "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡀⢄⠄⣀⠄⡀⣀⢠⢄⣖⣖⣞⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
            "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣱⡐⡕⡕⡽⣝⣟⣮⣾⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
            "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣽⣸⣃⣧⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    free_memory(tv, size);
     return 0;
 }
 
@@ -106,7 +113,7 @@ void menu(TV *structure, int size)
 {
     int index = 0;
     int k = 0;
-    while(k != 3)
+    while(k != 4)
     {
     printf("٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*");
     printf("\n1.Initiate structure array.\n"
@@ -126,7 +133,7 @@ void menu(TV *structure, int size)
             k = 1;
             break;
         case 2:
-            if(k != 1 )
+            if(k < 1 )
             {
                 printf("You didn't create an array.\n");
                 break;
@@ -135,7 +142,7 @@ void menu(TV *structure, int size)
             k = 2;
             break;
         case 3:
-            if(k != 2)
+            if(k < 2)
             {
                 printf("You didn't fill/create an array.\n");
                 break;
@@ -143,7 +150,7 @@ void menu(TV *structure, int size)
             double_sort(structure, size);
             break;
         case 4:
-            if(k != 2)
+            if(k < 2)
             {
                 printf("You didn't fill/create an array.\n");
                 break;
@@ -153,7 +160,7 @@ void menu(TV *structure, int size)
             break;
         case 5:
         {
-            if(k != 2)
+            if(k < 2)
             {
                 printf("You didn't fill/create an array.\n");
                 break;
@@ -162,13 +169,19 @@ void menu(TV *structure, int size)
             break;
         }
         case 6:
+            if(k == 3)
+            {
+                printf("You already parced file! \n");
+                break;
+            }
             structure = (TV*) calloc(62, sizeof (TV));
+            ///free_struct(structure, size);
             parce(structure);
-            k = 2;
+            k = 3;
             size = 61;
             break;
         case 7:
-            if(k != 2)
+            if(k < 2)
             {
                 printf("You didn't fill/create an array.\n");
                 break;
@@ -176,35 +189,50 @@ void menu(TV *structure, int size)
             single_sort(structure, size);
             break;
         case 8:
-            k = 3;
+            k = 4;
             break;
         default:
             printf("Wrong input!");
             break;
     }
     }
-    free_struct(structure, size);
+    //free_memory(structure, size);
 }
 
 
-void dell_struct(TV *structure, int *size)
+void dell_struct(TV **structure, int *size)
 {
+    if (structure == NULL || *structure == NULL) {
+        printf("Structure doesn't exist!");
+        return;
+    }
     int dell;
     int index = *size;
     printf("\nChoose TV that you want to delete.\n");
-    for (int k = 0; k < index; k++)
+    /*for (int k = 0; k < index; k++)
     {
-        printf("%d: %s\n", k, structure[k].name);
-    }
+        printf("%d: %s\n", k, (*structure)[k].name);
+    }*/
     check_in_range(&dell, 0, index - 1);
     for (int j = dell; j < index - 1; j++)
     {
-        structure[j] = structure[j + 1];
+        (*structure)[j] = (*structure)[j + 1];
     }
-    free(structure[*size - 1].name);
-    free(&structure[*size - 1]);
     (*size)--;
-    structure = (TV*)realloc(structure, *size * sizeof (TV));
+    free((*structure)[*size].name);
+    if (*size == 0) {
+        free(*structure);
+        *structure = NULL;
+        exit(0);
+    } else {
+        if (*structure != NULL) {
+            *structure = realloc(*structure, sizeof(TV) * (*size));
+            if (*structure == NULL) {
+                fprintf(stderr, "Failed to reallocate memory\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
 }
 
 void create_struct_arr(TV **structure, int *size)
@@ -238,6 +266,15 @@ void initiate_struct(TV *structure, int size)
     }
 }
 
+void print_name(TV *structure, int size)
+{
+    for (int i = 0; i < size; ++i)
+    {
+        rewind(stdout);
+        printf("%d : %s\n", i, structure[i].name);
+    }
+}
+
 void print_struct(TV *structure, int size)
 {
     for (int i = 0; i < size; ++i)
@@ -268,76 +305,20 @@ void single_sort(TV *structure, int num_of_elements) {
         printf("\nChoose sorting field.\n 1.Sort by name.\n 2.Sort by resolution."
                "\n 3.Sort by number of hdmi\n 4.Sort by price\n 5.Sort by available of Smart TV\n");
             check_in_range(&first, 1, 5);
-        switch (first) {
-            case 1:
-                qsort(structure, num_of_elements, sizeof (TV), compare_name);
-                break;
-            case 2:
-                qsort(structure, num_of_elements, sizeof (TV), compare_resolution);
-                break;
-            case 3:
-                qsort(structure, num_of_elements, sizeof (TV), compare_number_of_hdmi);
-                break;
-            case 4:
-                qsort(structure, num_of_elements, sizeof (TV), compare_price);
-                break;
-            case 5:
-                qsort(structure, num_of_elements, sizeof (TV), compare_smart_TV);
-                break;
-            default:
-                printf("Wrong input!");
-                break;
-        }
+    sort(structure, num_of_elements, first);
 }
 
 void double_sort(TV *structure, int num_of_elements)
 {
-    int index;
+    int first;
+    int second;
+    printf("\nChoose sorting fields.\n 1.Sort by name.\n 2.Sort by resolution."
+           "\n 3.Sort by number of hdmi\n 4.Sort by price\n 5.Sort by available of Smart TV\n");
+    check_in_range(&first, 0, 5);
+    check_in_range(&second, 0, 5);
+    sort(structure, num_of_elements, first);
+    d_sort(structure, num_of_elements, first, second);
 
-    printf("\nChoose sorting field.\n 1.Sort by name and resolution.\n 2.Sort by resolution.\n 3.Sort by number of hdmi\n 4.Sort by price\n 5.Sort by available of Smart TV\n");
-    check_in_range(&index, 0, 10);
-    switch (index) {
-        case 1:
-        ///name + res
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
-        break;
-        case 2:
-        ///name + hdmi
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_hdmi);
-            break;
-        case 3:
-        ///name + price
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_price);
-            break;
-        case 4:
-        ///name + smart_tv
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_smart_tv);
-            break;
-        case 5:
-        ///res + hdmi
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
-            break;
-        case 6:
-        ///res + price
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
-            break;
-        case 7:
-        ///res + smart_tv
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_name_res);
-            break;
-        case 8:
-        ///hdmi + price
-            qsort(structure, num_of_elements, sizeof(TV), compare_by_hdmi_price);
-        break;
-        case 9:
-        ///hdmi + smart_tv
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_hdmi_smart_tv);
-            break;
-        case 10:
-        ///price + smart_tv
-            qsort(structure, num_of_elements, sizeof (TV), compare_by_price_smart_tv);
-            break;
-    }
 }
 
 void parce(TV *structure)
@@ -542,15 +523,101 @@ void parce(TV *structure)
 }
 
 
-void free_struct(TV *structure, int size)
-{
-    for (int i = 0; i < size; ++i)
-    {
-        free(structure[i].name);
-        free(&structure[i]);
+void free_memory(TV *structure, int size) {
+    for (int i = 0; i < size; i++) {
+        if(structure[i].name != NULL)
+            free(structure[i].name);
+    }
+    free(structure);
+}
+
+int compare(const TV *tv1,const TV *tv2, int sort_by) {
+    switch(sort_by) {
+        case 1:
+            if (strcmp(tv1->name, tv2->name) > 0) {
+                return -1;
+            }
+            else if (strcmp(tv1->name, tv2->name) < 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+            break;
+        case 2:
+            if (tv1->resolution.w * tv1->resolution.h < tv2->resolution.w * tv2->resolution.h) {
+                return -1;
+            } else if (tv1->resolution.w * tv1->resolution.h > tv2->resolution.w * tv2->resolution.h) {
+                return 1;
+            } else {
+                return 0;
+            }
+            break;
+        case 3:
+            if (tv1->number_of_hdmi > tv2->number_of_hdmi) {
+                return 1;
+            }
+            else if (tv1->number_of_hdmi < tv2->number_of_hdmi) {
+                return -1;
+            }else {
+                return 0;
+            }
+            break;
+        case 4:
+            if (tv1->price > tv2->price) {
+                return 1;
+            }
+            else if (tv1->price < tv2->price) {
+                return -1;
+            }else {
+                return 0;
+            }
+            break;
+        case 5:
+            if (tv1->smart_TV > tv2->smart_TV) {
+                return 1;
+            }
+            else if (tv1->smart_TV < tv2->smart_TV) {
+                return -1;
+            }else {
+                return 0;
+            }
+            break;
+        default:
+            break;
+    }
+}
+//////////////////////////////////////////////////////////////
+void d_sort(TV *tvs, int size, int field1, int field2) {
+    TV temp;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size - 1; j++)
+        {
+            if (compare(&tvs[j], &tvs[j + 1], field1) == 0 && compare(&tvs[j], &tvs[j + 1], field2) < 0)
+            {
+                temp = tvs[j];
+                tvs[j] = tvs[j + 1];
+                tvs[j + 1] = temp;
+            }
+        }
     }
 }
 
+
+void sort(TV *tvs, int size, int sort_by) {
+    TV temp;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size - 1; j++)
+        {
+            if (compare(&tvs[j], &tvs[j + 1], sort_by) < 0)
+            {
+                temp = tvs[j];
+                tvs[j] = tvs[j + 1];
+                tvs[j + 1] = temp;
+            }
+        }
+    }
+}
+/////////////////////////////////////////////////////////////
 int compare_name(const void *p1, const void *p2) {
     const TV *tv1 = p1;
     const TV *tv2 = p2;
@@ -608,7 +675,7 @@ int compare_smart_TV(const void *p1, const void *p2) {
         return 0;
     }
 }
-
+/////////////////////////////////////////////////////////////////////
 int compare_by_name_res(const void *p1, const void *p2) {
     const TV *tv1 = p1;
     const TV *tv2 = p2;
