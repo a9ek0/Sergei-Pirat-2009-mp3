@@ -1,7 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <Windows.h>
+#include <windows.h>
 #include "mylib/structure.h"
+#include "mylib/menu.h"
 
 int main() {
     SetConsoleCP(65001);
