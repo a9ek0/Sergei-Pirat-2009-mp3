@@ -196,7 +196,7 @@ void initiate_struct(TV *structure, int size)
     {
         printf("\nEnter Name\n");
         scanf_s("%s", buffer);
-        structure[i].name = (char *) calloc(strlen(buffer) + 1, sizeof(char));
+        structure[i].name = (char *) calloc(wcslen(buffer) + 1, sizeof(char));
         strcpy_s(structure[i].name, wcslen(buffer) + 1,buffer);
         fflush(stdin);
         printf("\nEnter width of screen\n");
@@ -303,7 +303,7 @@ void parce(TV *structure)
             }
         }
 
-        if(i == wcslen(NAME))
+        if(i == strlen(NAME))
         {
             k = 0;
             c = (char)fgetc(f);
@@ -346,7 +346,7 @@ void parce(TV *structure)
         }
 
 
-        if(i == wcslen(HDMI))
+        if(i == strlen(HDMI))
         {
             structure[j].number_of_hdmi = 0;
             c = (char)fgetc(f);
@@ -384,7 +384,7 @@ void parce(TV *structure)
         }
 
 
-        if(i == wcslen(PRICE))
+        if(i == strlen(PRICE))
         {
             fscanf_s(f, "%f", &structure[j].price);
         }
@@ -417,7 +417,7 @@ void parce(TV *structure)
             c = (char)fgetc(f);
         }
 
-        if(i == wcslen(SMART_TV))
+        if(i == strlen(SMART_TV))
         {
             if((int)c == -47)
                 structure[j].smart_TV = 1;
@@ -451,7 +451,7 @@ void parce(TV *structure)
             }
         }
 
-        if(i == wcslen(RESOLUTION))
+        if(i == strlen(RESOLUTION))
         {
             fscanf_s(f, "%d", &structure[j].resolution.w);
             c = (char)fgetc(f);
