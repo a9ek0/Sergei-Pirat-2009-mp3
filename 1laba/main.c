@@ -549,7 +549,6 @@ int compare(const TV *tv1,const TV *tv2, int sort_by) {
             } else {
                 return 0;
             }
-            break;
         case 2:
             if (tv1->resolution.w * tv1->resolution.h < tv2->resolution.w * tv2->resolution.h) {
                 return -1;
@@ -558,7 +557,6 @@ int compare(const TV *tv1,const TV *tv2, int sort_by) {
             } else {
                 return 0;
             }
-            break;
         case 3:
             if (tv1->number_of_hdmi > tv2->number_of_hdmi) {
                 return 1;
@@ -568,7 +566,6 @@ int compare(const TV *tv1,const TV *tv2, int sort_by) {
             }else {
                 return 0;
             }
-            break;
         case 4:
             if (tv1->price > tv2->price) {
                 return 1;
@@ -578,7 +575,6 @@ int compare(const TV *tv1,const TV *tv2, int sort_by) {
             }else {
                 return 0;
             }
-            break;
         case 5:
             if (tv1->smart_TV > tv2->smart_TV) {
                 return 1;
@@ -588,7 +584,6 @@ int compare(const TV *tv1,const TV *tv2, int sort_by) {
             }else {
                 return 0;
             }
-            break;
         default:
             break;
     }
