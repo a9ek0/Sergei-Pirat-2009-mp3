@@ -271,6 +271,19 @@ void double_sort(TV *structure, int num_of_elements)
 
 }
 
+void find_parce_str(const char *find_str, char ch, int *find_len, FILE *parce_file)
+{
+
+    if (ch == find_str[0]) {
+        ch = (char)fgetc(parce_file);
+        while (ch == find_str[*find_len])
+        {
+            (*find_len)++;
+            ch = (char)fgetc(parce_file);
+        }
+    }
+}
+
 void parce(TV *structure)
 {
     ///NAME --- class="" alt="Телевизор
@@ -293,38 +306,25 @@ void parce(TV *structure)
     while(!feof(f)) {
         c = (char)fgetc(f);
 
-
-        if (c == NAME[0]) {
-            c = (char)fgetc(f);
-            while (c == NAME[i])
-            {
-                i++;
-                c = (char)fgetc(f);
-            }
-        }
+        find_parce_str(NAME, c, &i, f);
 
         if(i == strlen(NAME))
         {
             k = 0;
             c = (char)fgetc(f);
-            structure[j].name = (char*) malloc(1);
+            structure[j].name = (char*) malloc(10);
             while(c != '-')
             {
-                structure[j].name = (char*) realloc(structure[j].name, (k + 1));
+                structure[j].name = (char*) realloc(structure[j].name, k + 1);
                 structure[j].name[k] = c;
                 c = (char)fgetc(f);
                 k++;
             }
-            structure[j].name[k] = '\0';
-        }
-        else
-        {
-            i = 1;
-            continue;
+            structure[j].name = (char*) realloc(structure[j].name, k + 1);
+                structure[j].name[k] = '\0';
+                j++;
         }
 
-
-        j++;
         i = 1;
     }
     j = 0;
@@ -335,16 +335,7 @@ void parce(TV *structure)
     while(!feof(f)) {
         c = (char)fgetc(f);
 
-
-        if (c == HDMI[0]) {
-            c = (char)fgetc(f);
-            while (c == HDMI[i])
-            {
-                i++;
-                c = (char)fgetc(f);
-            }
-        }
-
+        find_parce_str(HDMI, c, &i, f);
 
         if(i == strlen(HDMI))
         {
@@ -355,15 +346,9 @@ void parce(TV *structure)
                 c = (char)fgetc(f);
             }
             structure[j].number_of_hdmi = atoi(&c);
-        }
-        else
-        {
-            i = 1;
-            continue;
+            j++;
         }
 
-
-        j++;
         i = 1;
     }
     fclose(f);
@@ -374,28 +359,14 @@ void parce(TV *structure)
     while(!feof(f)) {
         c = (char)fgetc(f);
 
-        if (c == PRICE[0]) {
-            c = (char)fgetc(f);
-            while (c == PRICE[i])
-            {
-                i++;
-                c = (char)fgetc(f);
-            }
-        }
-
+        find_parce_str(PRICE, c, &i, f);
 
         if(i == strlen(PRICE))
         {
             fscanf_s(f, "%f", &structure[j].price);
-        }
-        else
-        {
-            i = 1;
-            continue;
+            j++;
         }
 
-
-        j++;
         i = 1;
     }
     fclose(f);
@@ -406,32 +377,25 @@ void parce(TV *structure)
     while(!feof(f)) {
         c = (char)fgetc(f);
 
-        if (c == SMART_TV[0]) {
-            c = (char)fgetc(f);
-            while (c == SMART_TV[i])
-            {
-                i++;
-                c = (char)fgetc(f);
-            }
-            c = (char)fgetc(f);
-            c = (char)fgetc(f);
-        }
+        find_parce_str(SMART_TV, c, &i, f);
 
+        c = (char)fgetc(f);
+        c = (char)fgetc(f);
         if(i == strlen(SMART_TV))
         {
-            if((int)c == -47)
-                structure[j].smart_TV = 1;
-            if((int)c == -48)
-                structure[j].smart_TV = 0;
-        }
-        else
-        {
-            i = 1;
-            continue;
+            switch ((int)c) {
+                case -47:
+                    structure[j].smart_TV = 1;
+                    break;
+                case -48:
+                    structure[j].smart_TV = 0;
+                    break;
+                default:
+                    continue;
+            }
+            j++;
         }
 
-
-        j++;
         i = 1;
     }
     fclose(f);
@@ -442,27 +406,16 @@ void parce(TV *structure)
     while(!feof(f)) {
         c = (char)fgetc(f);
 
-        if (c == RESOLUTION[0]) {
-            c = (char)fgetc(f);
-            while (c == RESOLUTION[i])
-            {
-                i++;
-                c = (char)fgetc(f);
-            }
-        }
+        find_parce_str(RESOLUTION, c, &i, f);
 
         if(i == strlen(RESOLUTION))
         {
             fscanf_s(f, "%d", &structure[j].resolution.w);
             c = (char)fgetc(f);
             fscanf_s(f, "%d", &structure[j].resolution.h);
+            j++;
         }
-        else
-        {
-            i = 1;
-            continue;
-        }
-        j++;
+
         i = 1;
     }
     fclose(f);

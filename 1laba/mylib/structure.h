@@ -27,6 +27,7 @@ typedef struct{
     enum smart_tv smart_TV;
 }TV;
 
+void find_parce_str(const char *find_char, char ch, int *find_len, FILE *parce_file);
 void create_struct_arr(TV **structure, int *size);
 void initiate_struct(TV *structure, int size);
 void print_struct(TV *structure, int size);
