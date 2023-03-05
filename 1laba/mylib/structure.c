@@ -4,7 +4,7 @@ void menu(TV *structure, int size)
 {
     int index = 0;
     int k = 0;
-    while(1)
+    while(k != 4)
     {
         printf("٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*");
         printf("\n1.Initiate structure array.\n"
@@ -66,12 +66,15 @@ void menu(TV *structure, int size)
                     printf("You already parced file! \n");
                     break;
                 }
-                structure = (TV*) calloc(62, sizeof (TV));
-                if(structure == NULL)
-                    break;
+                free_memory(structure, size);
+                structure = (TV*) calloc(60, sizeof (TV));
+                if (structure == NULL) {
+                    printf("Structure doesn't exist!");
+                    return;
+                }
                 parce(structure);
                 k = 3;
-                size = 61;
+                size = 60;
                 break;
             case 7:
                 if(k < 2)
@@ -81,7 +84,7 @@ void menu(TV *structure, int size)
                 }
                 single_sort(structure, size);
                 break;
-            case 8:
+            case 8: {
                 printf("\n⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠛⠛⠉⠉⠉⠋⠛⠛⠛⠻⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
                        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠛⠉⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠉⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
                        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
@@ -118,9 +121,11 @@ void menu(TV *structure, int size)
                        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣱⡐⡕⡕⡽⣝⣟⣮⣾⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
                        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣽⣸⣃⣧⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
                 break;
+            }
             case 9:
+                k = 4;
                 free_memory(structure, size);
-                exit(EXIT_SUCCESS);
+                break;
             default:
                 printf("Wrong input!");
                 break;
@@ -192,7 +197,7 @@ void initiate_struct(TV *structure, int size)
         printf("\nEnter Name\n");
         scanf_s("%s", buffer);
         structure[i].name = (char *) calloc(strlen(buffer) + 1, sizeof(char));
-        strcpy(structure[i].name, buffer);
+        strcpy_s(structure[i].name, strlen(buffer) + 1,buffer);
         fflush(stdin);
         printf("\nEnter width of screen\n");
         scanf_s("%d", &structure[i].resolution.w);
@@ -270,7 +275,7 @@ void parce(TV *structure)
     ///HDMI --- Количество HDMI</td><td class='result__attr_val  cr-result__attr_odd'>
     ///PRICE --- data-price="
     FILE *f;
-    if ((f = fopen("parce.txt", "r")) == NULL)
+    if ((fopen_s(&f, "parce.txt", "r")) == NULL)
     {
         printf("Открыть файл не удалось\n");
         exit(1);
@@ -326,7 +331,7 @@ void parce(TV *structure)
     i = 1;
     fclose(f);
 ////////////////////////////////////////////HDMI
-    f = fopen("parce.txt", "r");
+    fopen_s(&f, "parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -365,7 +370,7 @@ void parce(TV *structure)
     j = 0;
     i = 1;
 //////////////////////////////////////////PRICE
-    f = fopen("parce.txt", "r");
+    fopen_s(&f, "parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -397,7 +402,7 @@ void parce(TV *structure)
     j = 0;
     i = 1;
 ///////////////////////////////////////////////////////////SMART TV
-    f = fopen("parce.txt", "r");
+    fopen_s(&f, "parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -433,7 +438,7 @@ void parce(TV *structure)
     j = 0;
     i = 1;
 ////////////////////////////////////RESOLUTION
-    f = fopen("parce.txt", "r");
+    fopen_s(&f, "parce.txt", "r");
     while(!feof(f)) {
         c = (char)fgetc(f);
 
@@ -448,9 +453,9 @@ void parce(TV *structure)
 
         if(i == strlen(RESOLUTION))
         {
-            fscanf(f, "%d", &structure[j].resolution.w);
+            fscanf_s(f, "%d", &structure[j].resolution.w);
             c = (char)fgetc(f);
-            fscanf(f, "%d", &structure[j].resolution.h);
+            fscanf_s(f, "%d", &structure[j].resolution.h);
         }
         else
         {
@@ -480,6 +485,8 @@ int compare(const TV *tv1,const TV *tv2, int sort_by) {
     int result = 0;
     switch(sort_by) {
         case 1:
+            if(tv1->name == NULL || tv2->name == NULL)
+                exit(EXIT_FAILURE);
             if (strcmp(tv1->name, tv2->name) > 0) {
                 result = -1;
             }
