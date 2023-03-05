@@ -191,6 +191,10 @@ void create_struct_arr(TV **structure, int *size) {
 
 void initiate_struct(TV *structure, int size)
 {
+    if (structure == NULL) {
+        printf("Structure doesn't exist!");
+        return;
+    }
     char buffer[255];
     for (int i = 0; i < size; ++i)
     {
