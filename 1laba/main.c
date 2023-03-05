@@ -10,7 +10,5 @@ int main() {
     tv = (TV*) calloc(1, sizeof(TV));
     int size = 0;
     menu(tv, size);
-   //free_memory(tv, size);
-    printf("asd");
     return 0;
 }
