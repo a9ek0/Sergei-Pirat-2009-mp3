@@ -386,7 +386,7 @@ void parce(TV *structure)
 
         if(i == strlen(PRICE))
         {
-            fscanf(f, "%f", &structure[j].price);
+            fscanf_s(f, "%f", &structure[j].price);
         }
         else
         {
