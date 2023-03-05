@@ -45,7 +45,7 @@ void sort_tvs(TV *tvs, int num_tvs, int compare1, int compare2);
 void free_memory(TV *structure, int size);
 /////////////////////////////////
 int compare(const TV *tv1,const TV *tv2, int sort_by);
-void sort(TV *tvs, int size, int sort_by);
+void sort(TV *structure, int size, int sort_by);
 void d_sort(TV *tvs, int size, int field1, int field2);
 //////////////////////single comp
 int compare_smart_TV(const void *p1, const void *p2);
@@ -177,7 +177,8 @@ void menu(TV *structure, int size)
                 break;
             }
             structure = (TV*) calloc(62, sizeof (TV));
-            ///free_struct(structure, size);
+            if(structure == NULL)
+                break;
             parce(structure);
             k = 3;
             size = 61;
@@ -609,16 +610,20 @@ void d_sort(TV *tvs, int size, int field1, int field2) {
 }
 
 
-void sort(TV *tvs, int size, int sort_by) {
+void sort(TV *structure, int size, int sort_by) {
     TV temp;
+    if(structure == NULL){
+        printf("Struct uninitialized!\n");
+        return;
+    }
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size - 1; j++)
         {
-            if (compare(&tvs[j], &tvs[j + 1], sort_by) < 0)
+            if (compare(&structure[j], &structure[j + 1], sort_by) < 0)
             {
-                temp = tvs[j];
-                tvs[j] = tvs[j + 1];
-                tvs[j + 1] = temp;
+                temp = structure[j];
+                structure[j] = structure[j + 1];
+                structure[j + 1] = temp;
             }
         }
     }
