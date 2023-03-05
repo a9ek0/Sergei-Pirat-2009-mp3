@@ -1,7 +1,6 @@
 //
 // Created by asduw on 06.03.2023.
 //
-
 #include "menu.h"
 void menu(TV *structure, int size)
 {

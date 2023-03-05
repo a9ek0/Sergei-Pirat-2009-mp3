@@ -4,8 +4,6 @@
 #include "structure_TV.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
 #ifndef INC_1LABA_MEMORY_H
 #define INC_1LABA_MEMORY_H
 void free_memory(TV *structure, int size);

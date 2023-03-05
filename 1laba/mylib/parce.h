@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
 #include "structure_TV.h"
 #ifndef INC_1LABA_PARCE_H
 #define INC_1LABA_PARCE_H
