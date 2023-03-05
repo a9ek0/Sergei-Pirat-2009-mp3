@@ -196,8 +196,8 @@ void initiate_struct(TV *structure, int size)
     {
         printf("\nEnter Name\n");
         scanf_s("%s", buffer);
-        structure[i].name = (char *) calloc(wcslen(buffer) + 1, sizeof(char));
-        strcpy_s(structure[i].name, wcslen(buffer) + 1,buffer);
+        structure[i].name = (char *) calloc(strlen(buffer) + 1, sizeof(char));
+        strcpy_s(structure[i].name, strlen(buffer) + 1,buffer);
         fflush(stdin);
         printf("\nEnter width of screen\n");
         scanf_s("%d", &structure[i].resolution.w);
@@ -275,11 +275,7 @@ void parce(TV *structure)
     ///HDMI --- Количество HDMI</td><td class='result__attr_val  cr-result__attr_odd'>
     ///PRICE --- data-price="
     FILE *f;
-    if ((fopen_s(&f, "parce.txt", "r")) == NULL)
-    {
-        printf("Открыть файл не удалось\n");
-        exit(1);
-    }
+    fopen_s(&f, "parce.txt", "r");
     char c;
     char NAME[24] = "alt=\"Телевизор"; ///-
     char PRICE[13] = "data-price="; ///"
