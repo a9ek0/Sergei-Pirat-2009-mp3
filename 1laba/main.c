@@ -115,7 +115,7 @@ void menu(TV *structure, int size)
 {
     int index = 0;
     int k = 0;
-    while(k != 4)
+    while(1)
     {
     printf("٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*");
     printf("\n1.Initiate structure array.\n"
@@ -192,14 +192,12 @@ void menu(TV *structure, int size)
             single_sort(structure, size);
             break;
         case 8:
-            k = 4;
-            break;
+            exit(EXIT_SUCCESS);
         default:
             printf("Wrong input!");
             break;
     }
     }
-
 }
 
 
@@ -230,17 +228,26 @@ void remove_tv(TV **structure, int index, int *size) {
         (*structure)[i] = (*structure)[i + 1];
     }
     *size -= 1;
-    TV *new_tvs = (TV*) realloc(*structure, *size * sizeof(TV));
-    if (new_tvs == NULL) {
-        printf("Error: memory reallocation failed.\n");
-        return;
+    if(*size == 0){
+        free(*structure);
+        *structure = NULL;
     }
-    *structure = new_tvs;
+    else {
+        TV *new_tvs = (TV *) realloc(*structure, *size * sizeof(TV));
+        if (new_tvs == NULL) {
+            printf("Error: memory reallocation failed.\n");
+            return;
+        }
+        *structure = new_tvs;
+    }
 }
 
 void create_struct_arr(TV **structure, int *size) {
     printf("Enter number of structures in array.\n");
     scanf_s("%d", size);
+    if(*structure != NULL){
+        free(*structure);
+    }
     *structure = (TV *) malloc(*size * sizeof(TV));
     if (*structure == NULL) {
         printf("Error: memory allocation failed.\n");
