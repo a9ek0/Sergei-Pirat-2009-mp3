@@ -3,10 +3,13 @@
 #include <string.h>
 #include <windows.h>
 #include <wchar.h>
+#include "mylib/structure.h"
+
 /*▀▄▀▄▀▄▀▄▀▄[̲̲̅̅т̲̲̅̅а̲̲̅̅к̲̲̅̅с̲̲̅̅и̲̲̅̅с̲̲̅̅т̲̲̅̅]▄▀▄▀▄▀▄▀▄▀*/
 /*٩(✿∂‿∂✿)۶(░S░I░m░P░o░T░я░Ж░к░@░)ヾ(o✪‿✪o)ｼ*/
 /*[̲̅0̲̅][̲̅0̲̅][̲̅7̲̅]░J░a░m░e░s░ ░B░o░n░d░(⌐■_■)--︻╦╤─ - - -*/
 
+/*
 enum smart_tv{
     AVAILABLE,
     NOT_AVAILABLE
@@ -63,6 +66,7 @@ int compare_by_name_smart_tv(const void *p1, const void *p2);
 int compare_by_hdmi_smart_tv(const void *p1, const void *p2);
 int compare_by_hdmi_price(const void *p1, const void *p2);
 
+*/
 
 int main() {
     SetConsoleCP(65001);
