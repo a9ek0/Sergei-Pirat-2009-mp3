@@ -4,6 +4,9 @@
 #include "mylib/menu.h"
 
 int main() {
+    FILE *f;
+    f = fopen("qwe","r");
+    fclose(f);
     SetConsoleCP(65001);
     SetConsoleOutputCP(65001);
     TV *tv;
