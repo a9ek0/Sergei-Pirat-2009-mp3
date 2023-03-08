@@ -7,7 +7,7 @@
 
 typedef struct Data{
     char *name;
-    char length;
+    int frequency;
 }Data;
 
 typedef struct Node{

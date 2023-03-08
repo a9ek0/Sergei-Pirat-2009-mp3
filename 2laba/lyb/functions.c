@@ -111,10 +111,12 @@ void free_node(Node *node)
 ///////////////////////////////////////HUI Z
 void copy_data(Data *dest_data, Data *source_data)
 {
+    if(dest_data == NULL)
+        exit(EXIT_FAILURE);
     dest_data = (Data*) malloc(sizeof (source_data));
     dest_data->name = (char*) malloc(strlen(source_data->name) + 1);
     strcpy(dest_data->name, source_data->name);
-    dest_data->length = source_data->length;
+    dest_data->frequency = source_data->frequency;
 }
 
 
