@@ -26,6 +26,7 @@ int main() {
         data->name = (char*) malloc(strlen(word) + 1);
         strcpy(data->name, word);
         data->frequency = 1;
+        ////dell_punct_marks(*word);
         if(find_in_stack(stack, word) == 0)
         {
             push(stack, data);
@@ -42,3 +43,7 @@ int main() {
     empty_the_stack(stack);
     return 0;
 }
+
+/////////find_biggest_popular(stack);
+////////find_lowest_unpopular(stack);
+////////find_in_file_and_swap(f, word);
