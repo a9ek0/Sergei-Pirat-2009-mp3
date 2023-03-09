@@ -28,7 +28,9 @@ int is_empty(Stack *stack);
 int stack_size(Stack *stack);
 void clear(Stack *stack);
 void destroy(Stack *stack);
-
+int find_in_stack(Stack *stack, char* word);
+void find_node(Stack *stack, int num, Node **node);
+void empty_the_stack(Stack *stack);
 
 //////////////////////////////MEMORY
 void free_node(Node *node);
