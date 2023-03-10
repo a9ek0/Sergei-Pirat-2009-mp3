@@ -164,5 +164,61 @@ void copy_data(Data *dest_data, Data *source_data)
     dest_data->frequency = source_data->frequency;
 }
 
-
+void dell_punct_marks(char **word_ptr)
+{
+    if (word_ptr == NULL || *word_ptr == NULL) {
+        exit(EXIT_FAILURE);
+    }
+    unsigned long long int size = strlen(*word_ptr);
+    if (size == 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (ispunct((*word_ptr)[0])) {
+        for (int i = 0; i < size; ++i) {
+            (*word_ptr)[i] = (*word_ptr)[i + 1];
+        }
+        size--;
+        *word_ptr = realloc(*word_ptr, size + 1);
+    }
+    if (size > 0 && ispunct((*word_ptr)[size - 1])) {
+        (*word_ptr)[size - 1] = '\0';
+        size--;
+        if (size == 0) {
+            free(*word_ptr);
+            *word_ptr = NULL;
+            return;
+        }
+        *word_ptr = realloc(*word_ptr, size + 1);
+    }
+}
 ////////////////////////////FILES
+void text_to_stack(char* name, Stack *stack)
+{
+    FILE *f;
+    char *word;
+    word = (char*) malloc(sizeof(char) * 50);
+    fopen_s(&f, name, "r");
+    Node *new_node = (Node*)malloc(sizeof(Node));  // выделение памяти для узла списка
+    Data *data;
+    while(fscanf(f, "%s", word) == 1)
+    {
+        data = (Data*) malloc(sizeof (Data));
+        data->name = (char*) malloc(strlen(word) + 1);
+        dell_punct_marks(&word);
+        strcpy(data->name, word);
+        data->frequency = 1;
+        if(find_in_stack(stack, word) == 0)
+        {
+            push(stack, data);
+        }
+        else
+        {
+            find_node(stack, find_in_stack(stack, word), &new_node);
+            new_node->data->frequency++;
+        }
+        free(data);
+        word = (char*) malloc(sizeof(char) * 50);
+    }
+    free(word);
+    fclose(f);
+}

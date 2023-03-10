@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <ctype.h>
 
 typedef struct Data{
     char *name;
@@ -37,7 +38,9 @@ void free_node(Node *node);
 
 /////////////////////////////HUI_Z
 void copy_data(Data *dest_data, Data *source_data);
+void dell_punct_marks(char **word_ptr);
 
 ////////////////////////////FILES
+void text_to_stack(char* name, Stack *stack);
 
 #endif //INC_2LABA_FUNCTIONS_H
