@@ -164,32 +164,19 @@ void copy_data(Data *dest_data, Data *source_data)
     dest_data->frequency = source_data->frequency;
 }
 
-void dell_punct_marks(char **word_ptr)
-{
+void dell_punct_marks(char **word_ptr) {
     if (word_ptr == NULL || *word_ptr == NULL) {
-        exit(EXIT_FAILURE);
+        return;
     }
-    unsigned long long int size = strlen(*word_ptr);
-    if (size == 0) {
-        exit(EXIT_FAILURE);
+    char *word = *word_ptr;
+    size_t size = strlen(word);
+    while (ispunct(word[0])) {
+        memmove(word, word + 1, size--);
     }
-    if (ispunct((*word_ptr)[0])) {
-        for (int i = 0; i < size; ++i) {
-            (*word_ptr)[i] = (*word_ptr)[i + 1];
-        }
-        size--;
-        *word_ptr = realloc(*word_ptr, size + 1);
+    while (size > 0 && ispunct(word[size - 1])) {
+        word[--size] = '\0';
     }
-    if (size > 0 && ispunct((*word_ptr)[size - 1])) {
-        (*word_ptr)[size - 1] = '\0';
-        size--;
-        if (size == 0) {
-            free(*word_ptr);
-            *word_ptr = NULL;
-            return;
-        }
-        *word_ptr = realloc(*word_ptr, size + 1);
-    }
+    *word_ptr = word;
 }
 ////////////////////////////FILES
 void text_to_stack(char* name, Stack *stack)
