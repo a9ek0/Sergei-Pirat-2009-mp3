@@ -105,7 +105,6 @@ void empty_the_stack(Stack *stack)
     if(stack == NULL)
         exit(EXIT_FAILURE);
     int size = stack_size(stack);
-    printf("%d ", size);
     for (int i = 0; i < size; ++i) {
         Data *data;
         data = pop(stack);
@@ -144,6 +143,103 @@ void find_node(Stack *stack, int num, Node **node)
     *node = new_node;
 }
 
+void find_biggest(Stack *stack, char *word)
+{
+    unsigned long long int size;
+    int buff_size = 0;
+    size = stack_size(stack);
+    Data *buff_data;
+    buff_data = (Data*) malloc(sizeof (Data));
+    buff_data->name = (char*) malloc(1);
+    Stack *buff_stack;
+    buff_stack = create_stack();
+    Node *new_node = stack->top;
+    for (int i = 0; i < size; ++i) {
+        if(strlen(new_node->data->name) == BIG_WORD)
+        {
+            copy_data(buff_data, new_node->data);
+            push(buff_stack, buff_data);
+            buff_size++;
+        }
+        new_node = new_node->next;
+
+    }
+    free(buff_data);
+    find_popular(buff_stack);
+    buff_data = pop(buff_stack);
+    strcpy(word, buff_data->name);
+    free(buff_data);
+}
+
+void find_smallest(Stack *stack, char *word)
+{
+    unsigned long long int size;
+    int buff_size = 0;
+    size = stack_size(stack);
+    Data *buff_data;
+    buff_data = (Data*) malloc(sizeof (Data));
+    buff_data->name = (char*) malloc(1);
+    Stack *buff_stack;
+    buff_stack = create_stack();
+    Node *new_node = stack->top;
+    for (int i = 0; i < size; ++i) {
+        if(strlen(new_node->data->name) == SMALL_WORD)
+        {
+            copy_data(buff_data, new_node->data);
+            push(buff_stack, buff_data);
+            buff_size++;
+        }
+        new_node = new_node->next;
+    }
+    free(buff_data);
+    find_unpopular(buff_stack);
+    buff_data = pop(buff_stack);
+    strcpy(word, buff_data->name);
+    free(buff_data);
+}
+
+void find_popular(Stack *stack)
+{
+    unsigned long long int size;
+    size = stack_size(stack);
+    Data *buff_data;
+    buff_data = (Data*) malloc(sizeof (Data));
+    Node *new_node;
+    for (int i = 0; i < size; ++i) {
+        new_node = stack->top;
+        for (int j = 0; j < size - 1; ++j) {
+            if (new_node->data->frequency < new_node->next->data->frequency) {
+                copy_data(buff_data, new_node->data);
+                copy_data(new_node->data, new_node->next->data);
+                copy_data(new_node->next->data, buff_data);
+            }
+            new_node = new_node->next;
+        }
+    }
+    free(buff_data);
+}
+
+
+void find_unpopular(Stack *stack)
+{
+    unsigned long long int size;
+    size = stack_size(stack);
+    Data *buff_data;
+    buff_data = (Data*) malloc(sizeof (Data));
+    Node *new_node;
+    for (int i = 0; i < size; ++i) {
+        new_node = stack->top;
+        for (int j = 0; j < size - 1; ++j) {
+            if (new_node->data->frequency > new_node->next->data->frequency) {
+                copy_data(buff_data, new_node->data);
+                copy_data(new_node->data, new_node->next->data);
+                copy_data(new_node->next->data, buff_data);
+            }
+            new_node = new_node->next;
+        }
+    }
+    free(buff_data);
+}
 ///////////////////////////////////////MEMORY
 void free_node(Node *node)
 {
@@ -185,7 +281,7 @@ void text_to_stack(char* name, Stack *stack)
     char *word;
     word = (char*) malloc(sizeof(char) * 50);
     fopen_s(&f, name, "r");
-    Node *new_node = (Node*)malloc(sizeof(Node));  // выделение памяти для узла списка
+    Node *new_node = (Node*)malloc(sizeof(Node));
     Data *data;
     while(fscanf(f, "%s", word) == 1)
     {
