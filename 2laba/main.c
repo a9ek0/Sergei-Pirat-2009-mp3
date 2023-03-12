@@ -29,21 +29,24 @@ int main() {
     }
     fclose(lyb);
     for (int i = 0; i < 10; ++i) {
-        if (fopen_s(&lyb, "lyb.txt", "rt+") != 0) {
+        if (fopen_s(&lyb, "lyb.txt", "at") != 0) {
             printf("Failed to open input file.\n");
             return 0;
         }
+
+
         find_smallest(stack, small_word);
         fputs(small_word, lyb);
         fputs(" ", lyb);
         find_biggest(stack, big_word);
         fputs(big_word, lyb);
         fputs("\n", lyb);
+
         fclose(lyb);
+
         replace_words_in_file("rjomba.txt", "lyb.txt", small_word, big_word);
-        ///////////////////////////////
-        clear(stack);
-        text_to_stack("compressed.txt", stack);
+
+        rewrite_stack("compressed_file.txt", stack);
     }
     return 0;
 }

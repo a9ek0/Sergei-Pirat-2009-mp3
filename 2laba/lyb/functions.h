@@ -41,6 +41,9 @@ void find_biggest(Stack *stack, char *word);
 void find_smallest(Stack *stack, char *word);
 void find_popular(Stack *stack);
 void find_unpopular(Stack *stack);
+void rewrite_stack(char* new_file_name, Stack *stack);
+
+
 
 
 //////////////////////////////MEMORY

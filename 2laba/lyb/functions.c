@@ -69,20 +69,22 @@ int stack_size(Stack *stack)
 
 void clear(Stack *stack)
 {
-    const void *tmp;
-    if(is_empty(stack) == 0)
-        exit(EXIT_FAILURE);
-    Node *new_stack = stack->top;
-    while(new_stack != NULL)
+    Node *current_node = stack->top;
+    while(current_node != NULL)
     {
-        free(new_stack->data->name);
-        free(new_stack->data);
-        tmp = new_stack->next;
-        free(new_stack->next);
-        free(new_stack);
-        new_stack = tmp;
-        tmp = NULL;
+        Node *next_node = current_node->next;
+        free(current_node->data->name);
+        free(current_node->data);
+        free(current_node);
+        current_node = next_node;
     }
+    stack->top = NULL;
+}
+
+void rewrite_stack(char* new_file_name, Stack *stack)
+{
+    clear(stack);
+    text_to_stack(new_file_name, stack);
 }
 
 void destroy(Stack *stack)
