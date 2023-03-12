@@ -76,7 +76,9 @@ void clear(Stack *stack)
     while(new_stack != NULL)
     {
         free(new_stack->data->name);
+        free(new_stack->data);
         tmp = new_stack->next;
+        free(new_stack->next);
         free(new_stack);
         new_stack = tmp;
         tmp = NULL;
@@ -259,8 +261,22 @@ void copy_data(Data *dest_data, Data *source_data)
     strcpy(dest_data->name, source_data->name);
     dest_data->frequency = source_data->frequency;
 }
+char* dell_punct_marks(char *word_ptr) {
+    if (word_ptr == NULL || *word_ptr == '\0') {
+        return NULL;
+    }
+    char *word = word_ptr;
+    size_t size = strlen(word);
+    while (ispunct(word[0])) {
+        memmove(word, word + 1, size--);
+    }
+    while (size > 0 && ispunct(word[size - 1])) {
+        word[--size] = '\0';
+    }
 
-void dell_punct_marks(char **word_ptr) {
+    return word;
+}
+/*void dell_punct_marks(char **word_ptr) {
     if (word_ptr == NULL || *word_ptr == NULL) {
         return;
     }
@@ -273,7 +289,7 @@ void dell_punct_marks(char **word_ptr) {
         word[--size] = '\0';
     }
     *word_ptr = word;
-}
+}*/
 ////////////////////////////FILES
 void text_to_stack(char* name, Stack *stack)
 {
@@ -287,7 +303,7 @@ void text_to_stack(char* name, Stack *stack)
     {
         data = (Data*) malloc(sizeof (Data));
         data->name = (char*) malloc(strlen(word) + 1);
-        dell_punct_marks(&word);
+        word = dell_punct_marks(word);
         strcpy(data->name, word);
         data->frequency = 1;
         if(find_in_stack(stack, word) == 0)

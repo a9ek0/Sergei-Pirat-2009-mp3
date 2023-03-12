@@ -48,7 +48,7 @@ void free_node(Node *node);
 
 /////////////////////////////HUI_Z
 void copy_data(Data *dest_data, Data *source_data);
-void dell_punct_marks(char **word_ptr);
+char* dell_punct_marks(char *word_ptr);
 
 ////////////////////////////FILES
 void text_to_stack(char* name, Stack *stack);
