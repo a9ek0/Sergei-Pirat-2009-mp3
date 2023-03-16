@@ -1,6 +1,148 @@
 #include "functions.h"
 
 ////////////////////////STACK
+
+char* least_frequent_word(Stack* stack, int length) {
+    // Создаем пустой словарь
+    Data* dict = malloc(sizeof(Data) * 10);
+    int dict_size = 10;
+
+    // Перебираем все слова в стеке
+    Node* current = stack->top;
+    while (current != NULL) {
+        // Если длина слова не соответствует заданной, пропускаем его
+        if (strlen(current->data->name) != length) {
+            current = current->next;
+            continue;
+        }
+
+        // Ищем слово в словаре
+        int index = -1;
+        for (int i = 0; i < dict_size; i++) {
+            if (dict[i].name == NULL) {
+                index = i;
+                break;
+            }
+            if (strcmp(dict[i].name, current->data->name) == 0) {
+                index = i;
+                break;
+            }
+        }
+
+        // Если слово уже есть в словаре, увеличиваем его частоту
+        if (index != -1) {
+            dict[index].frequency++;
+        }
+            // Иначе, добавляем его в словарь
+        else {
+            if (dict_size == 0) {
+                dict = realloc(dict, sizeof(Data));
+            } else {
+                dict = realloc(dict, sizeof(Data) * dict_size * 2);
+            }
+            dict[dict_size].name = current->data->name;
+            dict[dict_size].frequency = 1;
+            dict_size++;
+        }
+
+        current = current->next;
+    }
+
+    // Находим самое редкое слово в словаре
+    int min_freq = INT_MAX;
+    char* least_frequent = NULL;
+    for (int i = 0; i < dict_size; i++) {
+        if (dict[i].name != NULL && dict[i].frequency < min_freq) {
+            min_freq = dict[i].frequency;
+            least_frequent = dict[i].name;
+        }
+    }
+
+    // Освобождаем память
+    free(dict);
+
+    return least_frequent;
+}
+
+
+
+void qwe(Stack *stack)
+{
+    Stack *tmp_stack;
+    tmp_stack = create_stack();
+    unsigned long long size;
+    size = stack_size(stack);
+    for (int i = 0; i < size; ++i) {
+
+    }
+}
+
+
+
+
+
+char* most_frequent_word(Stack *stack, int length) {
+    // Сначала создаем пустой словарь
+    Data *dict = malloc(sizeof(Data) * 10);
+    int dict_size = 10;
+
+    // Перебираем все слова в стеке
+    Node *current = stack->top;
+    while (current != NULL) {
+        // Если длина слова не соответствует заданной, пропускаем его
+        if (strlen(current->data->name) != length) {
+            current = current->next;
+            continue;
+        }
+
+        // Ищем слово в словаре
+        int index = -1;
+        for (int i = 0; i < dict_size; i++) {
+            if (dict[i].name == NULL) {
+                index = i;
+                break;
+            }
+            if (strcmp(dict[i].name, current->data->name) == 0) {
+                index = i;
+                break;
+            }
+        }
+
+        // Если слово уже есть в словаре, увеличиваем его частоту
+        if (index != -1) {
+            dict[index].frequency++;
+        }
+            // Иначе, добавляем его в словарь
+        else {
+            if (dict_size == 0) {
+                dict = realloc(dict, sizeof(Data));
+            } else {
+                dict = realloc(dict, sizeof(Data) * dict_size * 2);
+            }
+            dict[dict_size].name = current->data->name;
+            dict[dict_size].frequency = 1;
+            dict_size++;
+        }
+
+        current = current->next;
+    }
+
+    // Находим самое частое слово в словаре
+    int max_freq = 0;
+    char *most_frequent = NULL;
+    for (int i = 0; i < dict_size; i++) {
+        if (dict[i].name != NULL && dict[i].frequency > max_freq) {
+            max_freq = dict[i].frequency;
+            most_frequent = dict[i].name;
+        }
+    }
+
+    // Освобождаем память
+    free(dict);
+
+    return most_frequent;
+}
+
 Stack *create_stack()
 {
     Stack *stack = (Stack*) malloc(sizeof (Stack));
@@ -147,60 +289,6 @@ void find_node(Stack *stack, int num, Node **node)
     *node = new_node;
 }
 
-void find_biggest(Stack *stack, char *word)
-{
-    unsigned long long int size;
-    int buff_size = 0;
-    size = stack_size(stack);
-    Data *buff_data;
-    buff_data = (Data*) malloc(sizeof (Data));
-    buff_data->name = (char*) malloc(1);
-    Stack *buff_stack;
-    buff_stack = create_stack();
-    Node *new_node = stack->top;
-    for (int i = 0; i < size; ++i) {
-        if(strlen(new_node->data->name) == BIG_WORD)
-        {
-            copy_data(buff_data, new_node->data);
-            push(buff_stack, buff_data);
-            buff_size++;
-        }
-        new_node = new_node->next;
-
-    }
-    free(buff_data);
-    find_popular(buff_stack);
-    buff_data = pop(buff_stack);
-    strcpy(word, buff_data->name);
-    free(buff_data);
-}
-
-void find_smallest(Stack *stack, char *word)
-{
-    unsigned long long int size;
-    int buff_size = 0;
-    size = stack_size(stack);
-    Data *buff_data;
-    buff_data = (Data*) malloc(sizeof (Data));
-    buff_data->name = (char*) malloc(1);
-    Stack *buff_stack;
-    buff_stack = create_stack();
-    Node *new_node = stack->top;
-    for (int i = 0; i < size; ++i) {
-        if(strlen(new_node->data->name) == SMALL_WORD)
-        {
-            copy_data(buff_data, new_node->data);
-            push(buff_stack, buff_data);
-            buff_size++;
-        }
-        new_node = new_node->next;
-    }
-    free(buff_data);
-    find_unpopular(buff_stack);
-    buff_data = pop(buff_stack);
-    strcpy(word, buff_data->name);
-    free(buff_data);
-}
 
 void find_popular(Stack *stack)
 {
@@ -244,6 +332,34 @@ void find_unpopular(Stack *stack)
     }
     free(buff_data);
 }
+
+///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Data* push_specific_node(Stack *stack, int node)
+{
+    if(stack == NULL)
+    {
+        printf("Stack doesn't exist!");
+        return NULL;
+    }
+    Stack *tmp_stack;
+    tmp_stack = create_stack();
+    Node *tmp_node;
+    Data *tmp_data;
+    for (int i = 0; i < node; ++i) {
+        push(tmp_stack, pop(stack));
+        tmp_node = stack->top->next;
+    }
+    tmp_data = pop(stack);
+    for (int i = 0; i < node; ++i) {
+        push(stack, pop(tmp_stack));
+    }
+    tmp_node = NULL;
+    free(tmp_node);
+    return tmp_data;
+}
+
+
+
 ///////////////////////////////////////MEMORY
 void free_node(Node *node)
 {
@@ -261,6 +377,7 @@ void copy_data(Data *dest_data, Data *source_data)
         exit(EXIT_FAILURE);
     dest_data->name = (char*) malloc(strlen(source_data->name) + 1);
     strcpy(dest_data->name, source_data->name);
+    dest_data->name[strlen(source_data->name) + 1] = '\0';
     dest_data->frequency = source_data->frequency;
 }
 char* dell_punct_marks(char *word_ptr) {
@@ -322,4 +439,26 @@ void text_to_stack(char* name, Stack *stack)
     }
     free(word);
     fclose(f);
+}
+
+void copy_file(const char *source_filename, const char *destination_filename) {
+    FILE *source_file;
+    FILE *destination_file;
+    char buffer[1024];
+    size_t bytes_read;
+
+    source_file = fopen(source_filename, "rb");
+    destination_file = fopen(destination_filename, "wb");
+
+    if (source_file == NULL || destination_file == NULL) {
+        printf("Ошибка: не удалось открыть файлы для копирования\n");
+        return;
+    }
+
+    while ((bytes_read = fread(buffer, 1, sizeof(buffer), source_file)) > 0) {
+        fwrite(buffer, 1, bytes_read, destination_file);
+    }
+
+    fclose(source_file);
+    fclose(destination_file);
 }

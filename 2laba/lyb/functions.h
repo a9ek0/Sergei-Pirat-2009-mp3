@@ -25,7 +25,19 @@ typedef struct Stack{
     struct Node *top;
 }Stack;
 
+typedef struct {
+    char *original_word;
+    char *replacement_word;
+    int word_length;
+} WordReplacement;
 //////////////////////////////STACK
+char* most_frequent_word(Stack *stack, int length);
+char* least_frequent_word(Stack* stack, int length);
+
+///////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Data* push_specific_node(Stack *stack, int node);
+
+
 Stack *create_stack();
 void push(Stack *stack, Data *data);
 Data *pop(Stack *stack);
@@ -55,5 +67,7 @@ char* dell_punct_marks(char *word_ptr);
 
 ////////////////////////////FILES
 void text_to_stack(char* name, Stack *stack);
+void copy_file(const char *source_filename, const char *destination_filename);
+
 
 #endif //INC_2LABA_FUNCTIONS_H
