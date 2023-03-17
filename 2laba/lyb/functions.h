@@ -5,6 +5,21 @@
 #include <string.h>
 #include <wchar.h>
 #include <ctype.h>
+#include <unistd.h>
+
+#define MAX_WORD_LEN 50
+#define MAX_LIB_WORDS 100
+
+typedef struct{
+    char *word;
+    char *replacment_word;
+}librar;
+
+typedef struct{
+    char *words;
+    int num_of_words;
+}library;
+
 
 enum word_length{
     BIG_WORD = 5,
@@ -55,7 +70,9 @@ void find_popular(Stack *stack);
 void find_unpopular(Stack *stack);
 void rewrite_stack(char* new_file_name, Stack *stack);
 
-
+void swap(Node *a, Node *b);
+void sort_stack(Stack* stack);
+void print_stack(Stack* stack);
 
 
 //////////////////////////////MEMORY
@@ -64,10 +81,12 @@ void free_node(Node *node);
 /////////////////////////////HUI_Z
 void copy_data(Data *dest_data, Data *source_data);
 char* dell_punct_marks(char *word_ptr);
+void replace_word(char* text, const char* old_word, const char* new_word);
+
 
 ////////////////////////////FILES
 void text_to_stack(char* name, Stack *stack);
 void copy_file(const char *source_filename, const char *destination_filename);
-
+void shift_file(FILE *file, int shift);
 
 #endif //INC_2LABA_FUNCTIONS_H
