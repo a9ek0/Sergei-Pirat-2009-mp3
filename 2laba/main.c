@@ -81,17 +81,17 @@ void replace_words(const char *name, const char *word1, const char *word2)
     char *cleaned_word;
     while(fscanf(file, "%s", word_tmp) == 1)
     {
+        //fseek(file, pos, SEEK_SET);
         cleaned_word = dell_punct_marks(word_tmp);
         if (strcmp(cleaned_word, word1) == 0)
         {
             //offset = sign_account(word_tmp);
             //printf("%d", offset);
             //fseek(file, 20, SEEK_SET);
-            pos = ftell(file);
             shift = (strlen(word1) - strlen(word2));
             shift_file(file, -(int)shift);
-            fseek(file, pos, SEEK_SET);
-            //fseek(file, pos - strlen(word2), SEEK_SET);
+            pos = ftell(file);
+            fseek(file, pos - strlen(word2), SEEK_SET);
             fprintf(file, "%s", word2);
             fseek(file, 0, SEEK_CUR);
         }
