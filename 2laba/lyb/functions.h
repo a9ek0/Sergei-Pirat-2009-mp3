@@ -11,14 +11,14 @@
 #define MAX_LIB_WORDS 100
 
 typedef struct{
-    char *word;
-    char *replacment_word;
-}librar;
+    char *word1;
+    char *word2;
+}replacement_words;
 
 typedef struct{
-    char *words;
+    replacement_words *words;
     int num_of_words;
-}library;
+}Library;
 
 
 enum word_length{
@@ -40,11 +40,6 @@ typedef struct Stack{
     struct Node *top;
 }Stack;
 
-typedef struct {
-    char *original_word;
-    char *replacement_word;
-    int word_length;
-} WordReplacement;
 //////////////////////////////STACK
 char* most_frequent_word(Stack *stack, int length);
 char* least_frequent_word(Stack* stack, int length);
@@ -71,9 +66,11 @@ void find_unpopular(Stack *stack);
 void rewrite_stack(char* new_file_name, Stack *stack);
 
 void swap(Node *a, Node *b);
-void sort_stack(Stack* stack);
+void sort_stack_h_l(Stack* stack);
+void sort_stack_l_h(Stack *stack);
 void print_stack(Stack* stack);
 
+void stack_to_lyb(Stack *stack, Library *lyb);
 
 //////////////////////////////MEMORY
 void free_node(Node *node);
@@ -88,5 +85,7 @@ void replace_word(char* text, const char* old_word, const char* new_word);
 void text_to_stack(char* name, Stack *stack);
 void copy_file(const char *source_filename, const char *destination_filename);
 void shift_file(FILE *file, int shift);
-
+void free_lyb(Library *lyb);
+void save_control_characters(FILE *file, FILE *file1);
+int my_isalpha(int ch);
 #endif //INC_2LABA_FUNCTIONS_H

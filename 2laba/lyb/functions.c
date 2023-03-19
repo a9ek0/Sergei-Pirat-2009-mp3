@@ -113,19 +113,46 @@ void print_stack(Stack* stack) {
     }
 }
 
-void sort_stack(Stack *stack) {
+void sort_stack_h_l(Stack *stack) {
     int n = stack_size(stack);
-    Node *curr = stack->top;
+    Node *curr;
     for (int i = 0; i < n; i++) {
         curr = stack->top;
         for (int j = 0; j < n - i - 1; j++) {
-            if (strlen(curr->data->name) < strlen(curr->next->data->name)) {
-                swap(curr, curr->next);
+            if (curr != NULL && curr->next != NULL && curr->data != NULL && curr->next->data != NULL) {
+                if (strlen(curr->data->name) < strlen(curr->next->data->name)) {
+                    swap(curr, curr->next);
+                }
+                else if (strlen(curr->data->name) == strlen(curr->next->data->name) && curr->data->frequency < curr->next->data->frequency) {
+                    swap(curr, curr->next);
+                }
+                else if (strlen(curr->data->name) == strlen(curr->next->data->name) && curr->data->frequency == curr->next->data->frequency && strcmp(curr->data->name, curr->next->data->name) < 0) {
+                    swap(curr, curr->next);
+                }
+                curr = curr->next;
             }
-            else if (strlen(curr->data->name) == strlen(curr->next->data->name) && curr->data->frequency < curr->next->data->frequency) {
-                swap(curr, curr->next);
+        }
+    }
+}
+
+void sort_stack_l_h(Stack *stack) {
+    int n = stack_size(stack);
+    Node *curr;
+    for (int i = 0; i < n; i++) {
+        curr = stack->top;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (curr != NULL && curr->next != NULL && curr->data != NULL && curr->next->data != NULL) {
+                if (strlen(curr->data->name) > strlen(curr->next->data->name)) {
+                    swap(curr, curr->next);
+                }
+                else if (strlen(curr->data->name) == strlen(curr->next->data->name) && curr->data->frequency > curr->next->data->frequency) {
+                    swap(curr, curr->next);
+                }
+                else if (strlen(curr->data->name) == strlen(curr->next->data->name) && curr->data->frequency == curr->next->data->frequency && strcmp(curr->data->name, curr->next->data->name) > 0) {
+                    swap(curr, curr->next);
+                }
+                curr = curr->next;
             }
-            curr = curr->next;
         }
     }
 }
@@ -136,6 +163,44 @@ void swap(Node *a, Node *b) {
     b->data = temp;
 }
 
+void stack_to_lyb(Stack *stack, Library *lyb)
+{
+    int i = 0;
+    Data *buff_data;
+    buff_data = (Data*) malloc(sizeof (Data));
+    sort_stack_l_h(stack);
+    while(strlen(stack->top->data->name) < 6)
+    {
+        buff_data = pop(stack);
+        if(strlen(buff_data->name) < 1 || buff_data->frequency != 1)
+        {
+            free(buff_data->name);
+            continue;
+        }
+        lyb->num_of_words++;
+        lyb->words = (replacement_words*) realloc(lyb->words, lyb->num_of_words * sizeof(replacement_words));
+        lyb->words[i].word1 = (char*) malloc(sizeof (char));
+        lyb->words[i].word2 = NULL;
+        lyb->words[i].word1 = strdup(buff_data->name);
+        i++;
+        free(buff_data->name);
+    }
+    i = 0;
+    sort_stack_h_l(stack);
+    while(strlen(stack->top->data->name) > 5)
+    {
+        buff_data = pop(stack);
+        if(lyb->num_of_words < (i + 1))
+            break;
+        else if(buff_data->frequency < 2)
+            continue;
+        lyb->words[i].word2 = (char*) malloc(sizeof (char));
+        lyb->words[i].word2 = strdup(buff_data->name);
+        i++;
+        free(buff_data->name);
+    }
+    free(buff_data);
+}
 
 
 int find_in_stack(Stack *stack, char* word)
@@ -265,61 +330,51 @@ char* dell_punct_marks(char *word_ptr) {
     }
     char *word = word_ptr;
     size_t size = strlen(word);
-    while (ispunct(word[0])) {
+    while (size > 0 && !isalpha(word[0])) {
         memmove(word, word + 1, size--);
     }
-    while (size > 0 && ispunct(word[size - 1])) {
+    while (size > 0 && !isalpha(word[size - 1])) {
         word[--size] = '\0';
     }
 
     return word;
 }
-/*void dell_punct_marks(char **word_ptr) {
-    if (word_ptr == NULL || *word_ptr == NULL) {
-        return;
-    }
-    char *word = *word_ptr;
-    size_t size = strlen(word);
-    while (ispunct(word[0])) {
-        memmove(word, word + 1, size--);
-    }
-    while (size > 0 && ispunct(word[size - 1])) {
-        word[--size] = '\0';
-    }
-    *word_ptr = word;
-}*/
-////////////////////////////FILES
-void text_to_stack(char* name, Stack *stack)
-{
+
+void text_to_stack(char* name, Stack *stack) {
     FILE *f;
     char word[MAX_WORD_LEN];
     char *cleaned_word;
-    f = fopen( name, "r");
-    if (f == NULL)
-    {
+    f = fopen(name, "r");
+    if (f == NULL) {
         printf("Error opening file!\n");
         return;
     }
     Node *new_node = (Node*)malloc(sizeof(Node));
     Data *data;
-    while(fscanf(f, "%s", word) == 1)
-    {
-        data = (Data*) malloc(sizeof (Data));
+    int is_new_word;
+    while (fscanf(f, "%s", word) == 1) {
         cleaned_word = dell_punct_marks(word);
-        data->name = (char*) malloc(strlen(word) + 1);
-        strcpy(data->name, cleaned_word);
-        data->frequency = 1;
-        if(find_in_stack(stack, cleaned_word) == 0)
-        {
+        if (strlen(cleaned_word) == 0) {
+            continue;
+        }
+        is_new_word = 1;
+        Node* curr = stack->top;
+        while (curr != NULL) {
+            if (strcmp(curr->data->name, cleaned_word) == 0) {
+                curr->data->frequency++;
+                is_new_word = 0;
+                break;
+            }
+            curr = curr->next;
+        }
+        if (is_new_word) {
+            data = (Data*) malloc(sizeof(Data));
+            data->name = (char*) malloc(strlen(cleaned_word) + 1);
+            strcpy(data->name, cleaned_word);
+            data->frequency = 1;
             push(stack, data);
         }
-        else
-        {
-            find_node(stack, find_in_stack(stack, cleaned_word), &new_node);
-            new_node->data->frequency++;
-        }
     }
-        //free(data);
     fclose(f);
 }
 
@@ -351,7 +406,6 @@ void replace_word(char* text, const char* old_word, const char* new_word) {
     int new_len = strlen(new_word);
 
     while ((pos = strstr(pos, old_word)) != NULL) {
-        // Заменяем найденное вхождение old_word на new_word
         memmove(pos + new_len, pos + old_len, strlen(pos + old_len) + 1);
         memcpy(pos, new_word, new_len);
         pos += new_len;
@@ -373,4 +427,28 @@ void shift_file(FILE *file, int shift)
     int fd = fileno(file);
     off_t new_size = lseek(fd, 0, SEEK_CUR) - shift;
     ftruncate(fd, new_size);
+}
+
+void free_lyb(Library *lyb)
+{
+    for (int i = 0; i < lyb->num_of_words; i++) {
+        free(lyb->words[i].word1);
+        free(lyb->words[i].word2);
+    }
+    free(lyb->words);
+    free(lyb);
+}
+
+void save_control_characters(FILE* file, FILE* file1) {
+    int next_char = fgetc(file1);
+        while(next_char == ' ' || next_char == '\n' || next_char == '\t' || next_char == '\r' || next_char == '\v' || next_char == '\f') {
+            fputc(next_char, file);
+            next_char = fgetc(file1);
+        }
+        if(next_char != EOF)
+            fseek(file1, -1, SEEK_CUR);
+}
+
+int my_isalpha(int ch) {
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }
