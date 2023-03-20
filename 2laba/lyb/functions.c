@@ -166,6 +166,47 @@ void swap(Node *a, Node *b) {
 void stack_to_lyb(Stack *stack, Library *lyb)
 {
     int i = 0;
+    int j = 0;
+    Data *buff_data;
+    buff_data = (Data*) malloc(sizeof (Data));
+    sort_stack_l_h(stack);
+    while(strlen(stack->top->data->name) < 6)
+    {
+        buff_data = pop(stack);
+        if(strlen(buff_data->name) < 1 || buff_data->frequency != 1)
+        {
+            free(buff_data->name);
+            continue;
+        }
+        lyb->num_of_words++;
+        lyb->words = (replacement_words*) realloc(lyb->words, lyb->num_of_words * sizeof(replacement_words));
+        lyb->words[i].word1 = (char*) malloc(sizeof (char));
+        lyb->words[i].word2 = NULL;
+        lyb->words[i].word1 = strdup(buff_data->name);
+        free(buff_data->name);
+        sort_stack_h_l(stack);
+        buff_data = pop(stack);
+        while(strlen(buff_data->name) > strlen(lyb->words[i].word1)) //buff_data->frequency > 1 && strlen(buff_data->name) > strlen(lyb->words[i].word)1
+        {
+            if(strlen(lyb->words[i].word1) * buff_data->frequency > strlen(buff_data->name))
+            {
+                lyb->words[i].word2 = strdup(buff_data->name);
+                continue;
+            }
+            buff_data = pop(stack);
+        }
+        i++;
+        sort_stack_l_h(stack);
+        free(buff_data->name);
+    }
+    free(buff_data);
+}
+
+
+/*
+void stack_to_lyb(Stack *stack, Library *lyb)
+{
+    int i = 0;
     Data *buff_data;
     buff_data = (Data*) malloc(sizeof (Data));
     sort_stack_l_h(stack);
@@ -201,6 +242,7 @@ void stack_to_lyb(Stack *stack, Library *lyb)
     }
     free(buff_data);
 }
+*/
 
 
 int find_in_stack(Stack *stack, char* word)

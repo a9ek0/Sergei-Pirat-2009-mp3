@@ -24,7 +24,7 @@ int main() {
 
     text_to_stack("rjomba.txt", stack);
 
-    print_stack(stack);
+    //print_stack(stack);
     stack_to_lyb(stack, lyb);
 
    // sort_stack_l_h(stack);
@@ -39,7 +39,7 @@ int main() {
 
     compress_file("compressed_file.txt", "temp.txt", lyb);
 
-    /*FILE *f;
+    FILE *f;
     f = fopen("compressed_file.txt", "at");
     fputs("\n", f);
     fputs("!1RvD8*ku$%TqFw&zPbN@5sLx", f);
@@ -50,11 +50,12 @@ int main() {
         fputs(lyb->words[i].word2, f);
         fputs("\n", f);
     }
-    fclose(f);*/
-    for (int i = 0; i < lyb->num_of_words; ++i) {
+    fclose(f);
+   /* for (int i = 0; i < lyb->num_of_words; ++i) {
+
         printf("%s - %s\n", lyb->words[i].word1, lyb->words[i].word2);
     }
-
+*/
     free_lyb(lyb);
     return 0;
 }
