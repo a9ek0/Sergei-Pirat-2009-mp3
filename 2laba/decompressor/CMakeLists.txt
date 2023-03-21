@@ -3,4 +3,4 @@ project(decompressor C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(decompressor main.c)
+add_executable(decompressor main.c functions.c)

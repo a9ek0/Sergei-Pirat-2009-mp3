@@ -491,3 +491,13 @@ void save_control_characters(FILE* file, FILE* file1) {
 int my_isalpha(int ch) {
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }
+
+
+void initialize_lyb(Library *lyb) {
+    lyb->num_of_words = 0;
+    lyb->words = malloc(1 * sizeof(replacement_words));
+    for (int i = 0; i < 1; i++) {
+        lyb->words[i].word1 = NULL;
+        lyb->words[i].word2 = NULL;
+    }
+}

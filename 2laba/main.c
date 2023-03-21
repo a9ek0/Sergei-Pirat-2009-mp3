@@ -13,34 +13,17 @@ int main() {
     stack = create_stack();
 
     Library *lyb = malloc(sizeof(Library));
-    lyb->num_of_words = 0;
-    lyb->words = malloc(1 * sizeof(replacement_words));
-    for (int i = 0; i < 1; i++) {
-        lyb->words[i].word1 = NULL;
-        lyb->words[i].word2 = NULL;
-    }
+    initialize_lyb(lyb);
 
     copy_file("rjomba.txt", "compressed_file.txt");
 
     text_to_stack("rjomba.txt", stack);
 
-    //print_stack(stack);
     stack_to_lyb(stack, lyb);
-
-   // sort_stack_l_h(stack);
-    //print_stack(stack);
-
-    //printf("\n\n\n\n");
-
-    //sort_stack_h_l(stack);
-    //print_stack(stack);
 
     compress_file("rjomba.txt", "compressed_file.txt", lyb);
 
     //compress_file("compressed_file.txt", "temp.txt", lyb);
-
-
-
 
     FILE *f;
     f = fopen("compressed_file.txt", "at");

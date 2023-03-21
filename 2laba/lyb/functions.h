@@ -88,4 +88,5 @@ void shift_file(FILE *file, int shift);
 void free_lyb(Library *lyb);
 void save_control_characters(FILE *file, FILE *file1);
 int my_isalpha(int ch);
+void initialize_lyb(Library *lyb);
 #endif //INC_2LABA_FUNCTIONS_H
