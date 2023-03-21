@@ -28,5 +28,6 @@ void delete_in_file_lyb(const char *file_name, const char *key);
 void file_to_lyb(FILE *file, Library *lyb, const char *key);
 void free_lyb(Library *lyb);
 void initialize_lyb(Library *lyb);
+void truncate_file(const char *file_name, ull pos);
 
 #endif //DECOMPRESSOR_FUNCTIONS_H

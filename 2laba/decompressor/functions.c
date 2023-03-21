@@ -44,18 +44,23 @@ void file_to_lyb(FILE *file, Library *lyb, const char *key)
 void delete_in_file_lyb(const char *file_name, const char *key)
 {
     FILE *file;
-    file = fopen(file_name, "r+");
+    file = fopen(file_name, "r");
     if(file == NULL)
         return;
     ull pos;
     find_key(file, key);
     pos = ftell(file);
-    fseek(file, pos - strlen(key), SEEK_SET);
+    fseek(file, (long)(pos - strlen(key)), SEEK_SET);
     pos = ftell(file);
     fclose(file);
 
+    truncate_file(file_name, pos);
+}
+
+void truncate_file(const char *file_name, ull pos)
+{
     int fd = open(file_name, O_RDWR);
-    ftruncate(fd, lseek(fd, pos, SEEK_SET));
+    ftruncate(fd, lseek(fd, (long)pos, SEEK_SET));
     close(fd);
 }
 
@@ -80,7 +85,8 @@ char* dell_punct_marks(char *word_ptr) {
     char *word = word_ptr;
     size_t size = strlen(word);
     while (size > 0 && !isalpha(word[0])) {
-        memmove(word, word + 1, size--);
+        size--;
+        memmove(word, word + 1, size);
     }
     while (size > 0 && !isalpha(word[size - 1])) {
         word[--size] = '\0';
@@ -101,19 +107,21 @@ void decompress_file(const char *input_file, const char* output_file, const Libr
 
     fw = fopen(output_file, "wt");
     if(fw == NULL)
+    {
+        printf("File doesn't exist!");
+        fclose(fr);
         return;
+    }
+
 
     char word[MAX_WORD_LEN];
     char tmp_word[MAX_WORD_LEN];
-    char *cleaned_word;
-    char next_chars[10];
+    const char *cleaned_word;
     int flag = 1;
-
 
     while(fscanf(fr, "%s", word) == 1)
     {
         strcpy(tmp_word, word);
-        //next_char = (char)getc(fr);
         cleaned_word = dell_punct_marks(word);
         flag = 1;
         for (int i = 0; i < lyb->num_of_words - 1; ++i) {
@@ -134,7 +142,6 @@ void decompress_file(const char *input_file, const char* output_file, const Libr
         }
 
     }
-    //free(cleaned_word);
     fclose(fr);
     fclose(fw);
 }
@@ -151,8 +158,8 @@ void save_control_characters(FILE* file, FILE* file1) {
 
 void replace_word(char* text, const char* old_word, const char* new_word) {
     char* pos = text;
-    int old_len = strlen(old_word);
-    int new_len = strlen(new_word);
+    ull old_len = strlen(old_word);
+    ull new_len = strlen(new_word);
 
     while ((pos = strstr(pos, old_word)) != NULL) {
         memmove(pos + new_len, pos + old_len, strlen(pos + old_len) + 1);
