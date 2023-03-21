@@ -26,7 +26,7 @@ void file_to_lyb(FILE *file, Library *lyb, const char *key)
     find_key(file, key);
     char word[MAX_WORD_LEN];
     char next_char;
-    while(fscanf(file, "%s", word) == 1)
+    while(fscanf(file, "%50s", word) == 1)
     {
         next_char = (char)fgetc(file);
         fseek(file, -1, SEEK_CUR);
@@ -69,7 +69,7 @@ void find_key(FILE *file, const char *key)
     if(file == NULL)
         exit(EXIT_FAILURE);
     char word[MAX_WORD_LEN];
-    while(fscanf(file, "%s", word) == 1)
+    while(fscanf(file, "%50s", word) == 1)
     {
         if(strcmp(word, key) == 0)
         {
@@ -119,7 +119,7 @@ void decompress_file(const char *input_file, const char* output_file, const Libr
     const char *cleaned_word;
     int flag = 1;
 
-    while(fscanf(fr, "%s", word) == 1)
+    while(fscanf(fr, "%50s", word) == 1)
     {
         strcpy(tmp_word, word);
         cleaned_word = dell_punct_marks(word);

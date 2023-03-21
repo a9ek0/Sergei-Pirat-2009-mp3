@@ -153,17 +153,19 @@ void sort_stack_l_h(Stack *stack) {
     }
 }
 
+
 void swap(Node *a, Node *b) {
     Data *temp = a->data;
     a->data = b->data;
     b->data = temp;
 }
 
+
+
 void stack_to_lyb(Stack *stack, Library *lyb)
 {
     int i = 0;
     Data *buff_data;
-    buff_data = (Data*) malloc(sizeof (Data));
     sort_stack_l_h(stack);
     while(strlen(stack->top->data->name) < 6)
     {
@@ -171,6 +173,7 @@ void stack_to_lyb(Stack *stack, Library *lyb)
         if(strlen(buff_data->name) < 1 || buff_data->frequency != 1)
         {
             free(buff_data->name);
+            free(buff_data);
             continue;
         }
         lyb->num_of_words++;
@@ -181,6 +184,7 @@ void stack_to_lyb(Stack *stack, Library *lyb)
         i++;
         free(buff_data->name);
     }
+    buff_data = NULL;
     i = 0;
     sort_stack_h_l(stack);
     while(strlen(stack->top->data->name) > 5)
@@ -345,7 +349,7 @@ void text_to_stack(const char *name, Stack *stack) {
     }
     Data *data;
     int is_new_word;
-    while (fscanf(f, "%s", word) == 1) {
+    while (fscanf(f, "%50s", word) == 1) {
         cleaned_word = dell_punct_marks(word);
         if (strlen(cleaned_word) == 0) {
             continue;
@@ -502,7 +506,7 @@ void compress_file(const char *input_file, const char* output_file, const Librar
     int flag = 1;
 
 
-    while(fscanf(fr, "%s", word) == 1)
+    while(fscanf(fr, "%50s", word) == 1)
     {
         strcpy(tmp_word, word);
         cleaned_word = dell_punct_marks(word);
