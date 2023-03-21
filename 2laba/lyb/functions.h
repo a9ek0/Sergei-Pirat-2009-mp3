@@ -5,10 +5,9 @@
 #include <string.h>
 #include <wchar.h>
 #include <ctype.h>
-#include <unistd.h>
 
 #define MAX_WORD_LEN 50
-#define MAX_LIB_WORDS 100
+
 typedef unsigned long long ull;
 
 typedef struct{

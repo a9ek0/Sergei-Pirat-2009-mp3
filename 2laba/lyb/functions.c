@@ -412,22 +412,6 @@ void replace_word(char* text, const char* old_word, const char* new_word) {
     }
 }
 
-void shift_file(FILE *file, int shift)
-{
-    int pos = ftell(file);
-    fseek(file, 0, SEEK_END);
-    int size = ftell(file);
-    fseek(file, pos, SEEK_SET);
-    char *buff = (char*) malloc((size + 1) * sizeof (char));
-    fread(buff, size, 1, file);
-    buff[size] = '\0';
-    fseek(file, pos + shift, SEEK_SET);
-    fputs(buff, file);
-    free(buff);
-    int fd = fileno(file);
-    off_t new_size = lseek(fd, 0, SEEK_CUR) - shift;
-    ftruncate(fd, new_size);
-}
 
 void free_lyb(Library *lyb)
 {
