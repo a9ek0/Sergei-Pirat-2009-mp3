@@ -37,7 +37,10 @@ int main() {
 
     compress_file("rjomba.txt", "compressed_file.txt", lyb);
 
-    compress_file("compressed_file.txt", "temp.txt", lyb);
+    //compress_file("compressed_file.txt", "temp.txt", lyb);
+
+
+
 
     FILE *f;
     f = fopen("compressed_file.txt", "at");
