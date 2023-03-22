@@ -1,10 +1,7 @@
 #include "lyb/functions.h"
-#include <Windows.h>
 
 
 int main() {
-    SetConsoleCP(65001);
-    SetConsoleOutputCP(65001);
 
     Stack *stack;
     stack = create_stack();
@@ -14,6 +11,9 @@ int main() {
 
     text_to_stack("rjomba.txt", stack);
     stack_to_lyb(stack, lyb);
+    for (int i = 0; i < lyb->num_of_words; ++i) {
+        printf("\n%s - %s", lyb->words[i].word1, lyb->words[i].word2);
+    }
 
     compress_file("rjomba.txt", "compressed_file.txt", lyb);
 

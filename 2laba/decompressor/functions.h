@@ -19,6 +19,8 @@ typedef struct{
     int num_of_words;
 }Library;
 
+
+void check_control_chars(FILE* input_file, FILE* output_file);
 char* dell_punct_marks(char *word_ptr);
 void find_key(FILE *file, const char *key);
 void replace_word(char* text, const char* old_word, const char* new_word);

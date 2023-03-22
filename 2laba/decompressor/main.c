@@ -13,6 +13,7 @@ int main() {
     char output_file_name[11] = "source.txt";
     char key[26] = "!1RvD8*ku$%TqFw&zPbN@5sLx";
 
+
     FILE *file;
     file = fopen(input_file_name, "r");
     if(file == NULL)

@@ -162,23 +162,23 @@ void swap(Node *a, Node *b) {
 
 
 
-void stack_to_lyb(Stack *stack, Library *lyb)
-{
+
+
+
+void stack_to_lyb(Stack *stack, Library *lyb) {
     int i = 0;
     Data *buff_data;
     sort_stack_l_h(stack);
-    while(strlen(stack->top->data->name) < 6)
-    {
+    while (strlen(stack->top->data->name) < 6) {
         buff_data = pop(stack);
-        if(strlen(buff_data->name) < 1 || buff_data->frequency != 1)
-        {
+        if (strlen(buff_data->name) < 1 || buff_data->frequency != 1 || !isalpha(buff_data->name[0])) {
             free(buff_data->name);
             free(buff_data);
             continue;
         }
         lyb->num_of_words++;
-        lyb->words = (replacement_words*) realloc(lyb->words, lyb->num_of_words * sizeof(replacement_words));
-        lyb->words[i].word1 = (char*) malloc(sizeof (char));
+        lyb->words = (replacement_words *) realloc(lyb->words, lyb->num_of_words * sizeof(replacement_words));
+        lyb->words[i].word1 = (char *) malloc(sizeof(char));
         lyb->words[i].word2 = NULL;
         lyb->words[i].word1 = strdup(buff_data->name);
         i++;
@@ -187,20 +187,21 @@ void stack_to_lyb(Stack *stack, Library *lyb)
     buff_data = NULL;
     i = 0;
     sort_stack_h_l(stack);
-    while(strlen(stack->top->data->name) > 5)
-    {
-        buff_data = pop(stack);
-        if(lyb->num_of_words < (i + 1))
-            break;
-        else if(buff_data->frequency < 2)
-            continue;
-        lyb->words[i].word2 = (char*) malloc(sizeof (char));
-        lyb->words[i].word2 = strdup(buff_data->name);
-        i++;
-        free(buff_data->name);
+    for (int j = 0; j < lyb->num_of_words; ++j) {
+        while (strlen(stack->top->data->name) > 6) {
+            buff_data = pop(stack);
+            if (buff_data->frequency > 2 &&
+                strlen(lyb->words[i].word1) * buff_data->frequency + strlen(buff_data->name) <
+                strlen(buff_data->name) * buff_data->frequency + strlen(lyb->words[i].word1)) {
+                lyb->words[j].word2 = strdup(buff_data->name);
+                free(buff_data->name);
+                break;
+            }
+        }
     }
     free(buff_data);
 }
+
 
 
 int find_in_stack(Stack *stack, const char *word)
@@ -455,7 +456,7 @@ void put_lyb_to_file(const char *file_name, const Library *lyb)
     fputs("\n", f);
     fputs("!1RvD8*ku$%TqFw&zPbN@5sLx", f);
     fputs("\n", f);
-    for (int i = 0; i < lyb->num_of_words - 1; ++i) {
+    for (int i = 0; i < lyb->num_of_words; ++i) {
         fputs(lyb->words[i].word1, f);
         fputs(" ", f);
         fputs(lyb->words[i].word2, f);
@@ -470,6 +471,7 @@ void put_lyb_to_file(const char *file_name, const Library *lyb)
 
 void compress_file(const char *input_file, const char* output_file, const Library *lyb)
 {
+
     FILE *fr;
 
     fr = fopen(input_file, "rt");
@@ -478,7 +480,7 @@ void compress_file(const char *input_file, const char* output_file, const Librar
 
     FILE *fw;
 
-    fw = fopen(output_file, "wt");
+    fw = fopen(output_file, "wt+");
     if(fw == NULL) {
         fclose(fr);
         return;
@@ -487,7 +489,7 @@ void compress_file(const char *input_file, const char* output_file, const Librar
     char tmp_word[MAX_WORD_LEN];
     const char *cleaned_word;
     int flag = 1;
-
+    check_control_chars(fr, fw);
 
     while(fscanf(fr, "%50s", word) == 1)
     {
@@ -514,4 +516,27 @@ void compress_file(const char *input_file, const char* output_file, const Librar
     }
     fclose(fr);
     fclose(fw);
+}
+
+
+void check_control_chars(FILE* input_file, FILE* output_file) {
+    if (input_file == NULL) {
+        perror("Input file opening failed");
+        return;
+    }
+    if (output_file == NULL) {
+        perror("Output file opening failed");
+        fclose(input_file);
+        return;
+    }
+
+    int c;
+    while ((c = fgetc(input_file)) != EOF) {
+        if (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\v' || c == '\f') {
+            fputc(c, output_file);
+        } else {
+            fseek(input_file, -1, SEEK_CUR);
+            break;
+        }
+    }
 }

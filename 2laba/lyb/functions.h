@@ -96,6 +96,5 @@ void save_control_characters(FILE *file, FILE *file1);
 int my_isalpha(int ch);
 void initialize_lyb(Library *lyb);
 void put_lyb_to_file(const char *file_name, const Library *lyb);
-
-
+void check_control_chars(FILE* input_file, FILE* output_file);
 #endif //INC_2LABA_FUNCTIONS_H

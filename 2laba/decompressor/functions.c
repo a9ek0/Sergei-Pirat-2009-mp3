@@ -50,7 +50,7 @@ void delete_in_file_lyb(const char *file_name, const char *key)
     ull pos;
     find_key(file, key);
     pos = ftell(file);
-    fseek(file, (long)(pos - strlen(key)), SEEK_SET);
+    fseek(file, (long)(pos - strlen(key) - 2), SEEK_SET);
     pos = ftell(file);
     fclose(file);
 
@@ -119,6 +119,7 @@ void decompress_file(const char *input_file, const char* output_file, const Libr
     const char *cleaned_word;
     int flag = 1;
 
+    check_control_chars(fr, fw);
     while(fscanf(fr, "%50s", word) == 1)
     {
         strcpy(tmp_word, word);
@@ -165,5 +166,31 @@ void replace_word(char* text, const char* old_word, const char* new_word) {
         memmove(pos + new_len, pos + old_len, strlen(pos + old_len) + 1);
         memcpy(pos, new_word, new_len);
         pos += new_len;
+    }
+}
+
+
+
+
+
+void check_control_chars(FILE* input_file, FILE* output_file) {
+    if (input_file == NULL) {
+        perror("Input file opening failed");
+        return;
+    }
+    if (output_file == NULL) {
+        perror("Output file opening failed");
+        fclose(input_file);
+        return;
+    }
+
+    int c;
+    while ((c = fgetc(input_file)) != EOF) {
+        if (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\v' || c == '\f') {
+            fputc(c, output_file);
+        } else {
+            fseek(input_file, -1, SEEK_CUR);
+            break;
+        }
     }
 }
