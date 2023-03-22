@@ -21,10 +21,6 @@ typedef struct{
 }Library;
 
 
-enum word_length{
-    BIG_WORD = 5,
-    SMALL_WORD = 3
-};
 
 typedef struct Data{
     char *name;
