@@ -3,4 +3,4 @@ project(3laba C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(3laba main.c)
+add_executable(3laba main.c functions.c)
