@@ -5,6 +5,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 typedef unsigned long long ull;
 
@@ -41,7 +42,17 @@ typedef struct {
 void convert_to_bw(FILE *input_file, FILE *output_file);
 void convert_to_negative(FILE *input_file, FILE *output_file);
 void gamma_correction(FILE *input_file, FILE *output_file, float gamma);
+int compare(const void* a, const void* b);
+size_t find_median_value(const PIXEL *pixels,const BITMAPINFOHEADER *info_header, size_t num_of_pixel);
+void median_filtering(FILE *input_file, FILE *output_file, int window_size);
+size_t get_median_value(size_t* values, size_t count);
+void add_white_noise(FILE* input_file, FILE* output_file, float noise_factor);
+
 
 int is_bmp_file(const char* file_name);
 FILE* open_bmp_file(const char *file_name, const char *extension);
+void check_in_range(int *value, int left_boarder, int right_boarder);
+void copy_file(FILE* inputFile, FILE* outputFile);
+void menu(FILE *input_file, FILE *output_file, const char* output_file_name);
+FILE *copy_binary_file(FILE *input_file, FILE *output_file, const char *output_file_name);
 #endif //INC_3LABA_FUNCTIONS_H
