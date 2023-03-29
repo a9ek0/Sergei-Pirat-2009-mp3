@@ -176,16 +176,14 @@ void median_filtering(FILE *input_file, FILE *output_file, int window_size)
     size_t* valuesb = malloc(window_size * window_size * sizeof(size_t));
     for (size_t i = window_size / 2; i < header.biHeight - window_size / 2; i++) {
         for (size_t j = window_size / 2; j < header.biWidth - window_size / 2; j++) {
-            size_t index = 0;
-            for (int k = -window_size / 2; k <= window_size / 2; k++) {
-                for (int l = -window_size / 2; l <= window_size / 2; l++) {
-                    size_t row = i + k;
-                    size_t col = j + l;
-                    valuesr[index] = pixels[row * header.biWidth + col].r;
-                    valuesg[index] = pixels[row * header.biWidth + col].g;
-                    valuesb[index] = pixels[row * header.biWidth + col].b;
-                    index++;
-                }
+            size_t row = i - window_size / 2;
+            size_t col = j - window_size / 2;
+            for (size_t k = 0; k < window_size * window_size; k++) {
+                size_t idx = k / window_size;
+                size_t jdx = k % window_size;
+                valuesr[k] = pixels[(row + idx) * header.biWidth + col + jdx].r;
+                valuesg[k] = pixels[(row + idx) * header.biWidth + col + jdx].g;
+                valuesb[k] = pixels[(row + idx) * header.biWidth + col + jdx].b;
             }
             pixels[i * header.biWidth + j].r = (uint8_t)get_median_value(valuesr, window_size * window_size);
             pixels[i * header.biWidth + j].g = (uint8_t)get_median_value(valuesg, window_size * window_size);
@@ -204,29 +202,36 @@ void median_filtering(FILE *input_file, FILE *output_file, int window_size)
     free(pixels);
 }
 
-size_t get_median_value(size_t* values, size_t count) {
+size_t get_median_value(size_t *values, const size_t count) {
     if (count == 0 || values == NULL) {
         return 0;
     }
 
     for (size_t i = 0; i < count - 1; i++) {
         for (size_t j = i + 1; j < count; j++) {
-            if (values[j] < values[i]) {
-                size_t temp = values[i];
-                values[i] = values[j];
-                values[j] = temp;
+            const size_t temp_i = values[i];
+            const size_t temp_j = values[j];
+            if (temp_j < temp_i) {
+                values[i] = temp_j;
+                values[j] = temp_i;
             }
         }
     }
-    size_t median;
+
+    size_t median_value;
     if (count % 2 == 0) {
-        median = (values[count / 2 - 1] + values[count / 2]) / 2;
+        median_value = (values[count / 2 - 1] + values[count / 2]) / 2;
     } else {
-        median = values[count / 2];
+        median_value = values[count / 2];
     }
 
-    return median;
+    return median_value;
 }
+
+
+
+
+
 
 void add_white_noise(FILE* input_file, FILE* output_file, float noise_factor) {
     if (!input_file) {
