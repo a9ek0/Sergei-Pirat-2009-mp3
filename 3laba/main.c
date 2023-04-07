@@ -26,8 +26,6 @@ int main()
 
     output_file = copy_binary_file(input_file, output_file, output_file_name);
 
-
-
     menu(input_file, output_file, output_file_name);
 
 

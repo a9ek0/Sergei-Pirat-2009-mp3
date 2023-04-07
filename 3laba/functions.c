@@ -1,13 +1,21 @@
 #include "functions.h"
 
 FILE* open_bmp_file(const char *file_name, const char *extension){
-    const FILE *bmp_file;
+    FILE *bmp_file;
     if(is_bmp_file(file_name)){
         bmp_file = fopen(file_name, extension);
         if (bmp_file == NULL){
             fprintf(stderr, "Error: unable to open file.\n");
             exit(EXIT_FAILURE);
         }
+        BITMAPINFOHEADER info_header;
+        fseek(bmp_file, 14, SEEK_SET);
+        fread(&info_header, sizeof(BITMAPINFOHEADER), 1, bmp_file);
+        if (info_header.biBitCount != 24){
+            fprintf(stderr, "Error: BMP image is not 24-bit.\n");
+            exit(EXIT_FAILURE);
+        }
+
         return bmp_file;
     }else{
         fprintf(stderr, "Error: the file has the wrong extension.\n");
@@ -174,6 +182,7 @@ void median_filtering(FILE *input_file, FILE *output_file, int window_size)
     size_t* valuesr = malloc(window_size * window_size * sizeof(size_t));
     size_t* valuesg = malloc(window_size * window_size * sizeof(size_t));
     size_t* valuesb = malloc(window_size * window_size * sizeof(size_t));
+
     for (size_t i = window_size / 2; i < header.biHeight - window_size / 2; i++) {
         for (size_t j = window_size / 2; j < header.biWidth - window_size / 2; j++) {
             size_t row = i - window_size / 2;
@@ -280,9 +289,18 @@ void add_white_noise(FILE* input_file, FILE* output_file, float noise_factor) {
     free(pixels);
 }
 
-void check_in_range(int *value, int left_boarder, int right_boarder)
+void check_in_range_int(int *value, int left_boarder, int right_boarder)
 {
     while (scanf_s("%d", value) == 0 || getchar() !='\n' || *value < left_boarder || *value > right_boarder)
+    {
+        printf("Wrong input");
+        rewind(stdin);
+    }
+}
+
+void check_in_range_float(float *value, float left_boarder, float right_boarder)
+{
+    while (scanf_s("%f", value) == 0 || getchar() !='\n' || *value < left_boarder || *value > right_boarder)
     {
         printf("Wrong input");
         rewind(stdin);
@@ -337,7 +355,7 @@ void menu(FILE *input_file, FILE *output_file, const char* output_file_name)
                "\n6.View image"
                "\n7.Reset changes"
                "\n8.Exit\n");
-        check_in_range(&expression, 1, 8);
+        check_in_range_int(&expression, 1, 8);
         switch (expression) {
             case 1:
                 convert_to_negative(output_file, output_file);
@@ -348,20 +366,20 @@ void menu(FILE *input_file, FILE *output_file, const char* output_file_name)
             case 3:
                 printf("Enter gamma value."
                        "\nRecommended value from 1 to 2.5\n");
-                scanf("%f", &value);
+                check_in_range_float(&value, 0, 100);
 
                 gamma_correction(output_file, output_file, value);
                 break;
             case 4:
                 printf("Enter noise value."
                        "\nMaximum noise level at value 1\n");
-                scanf("%f", &value);
+                check_in_range_float(&value, 0, 1);
 
                 add_white_noise(output_file, output_file, value);
                 break;
             case 5:
                 printf("Enter field size for median filtering\n");
-                scanf("%f", &value);
+                check_in_range_float(&value, 0, 10);
 
                 median_filtering(output_file, output_file, (int)value);
                 break;
@@ -390,12 +408,18 @@ void menu(FILE *input_file, FILE *output_file, const char* output_file_name)
 }
 
 FILE *copy_binary_file(FILE *input_file, FILE *output_file, const char *output_file_name) {
-    unsigned char buffer[1024];
+    unsigned char *buffer;
     size_t bytes_read;
 
-    while ((bytes_read = fread(buffer, sizeof(unsigned char), sizeof(buffer), input_file)) > 0) {
-        fwrite(buffer, sizeof(unsigned char), bytes_read, output_file);
-    }
+    fseek(input_file, 0, SEEK_END);
+    bytes_read = ftell(input_file);
+
+    buffer = (unsigned char*) malloc(bytes_read * sizeof (unsigned char));
+    fseek(input_file, 0, SEEK_SET);
+    fread(buffer, sizeof(unsigned char), bytes_read, input_file);
+    fseek(output_file, 0, SEEK_SET);
+    fwrite(buffer, sizeof(unsigned char), bytes_read, output_file);
+
 
     fclose(output_file);
     output_file = open_bmp_file(output_file_name, "rb+");

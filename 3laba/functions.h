@@ -7,8 +7,6 @@
 #include <math.h>
 #include <time.h>
 
-typedef unsigned long long ull;
-
 typedef struct {
     uint16_t bfType;
     uint32_t bfSize;
@@ -51,7 +49,8 @@ void add_white_noise(FILE* input_file, FILE* output_file, float noise_factor);
 
 int is_bmp_file(const char* file_name);
 FILE* open_bmp_file(const char *file_name, const char *extension);
-void check_in_range(int *value, int left_boarder, int right_boarder);
+void check_in_range_int(int *value, int left_boarder, int right_boarder);
+void check_in_range_float(float *value, float left_boarder, float right_boarder);
 void copy_file(FILE* inputFile, FILE* outputFile);
 void menu(FILE *input_file, FILE *output_file, const char* output_file_name);
 FILE *copy_binary_file(FILE *input_file, FILE *output_file, const char *output_file_name);
