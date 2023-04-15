@@ -57,7 +57,7 @@ int main() {
     file_to_tree(&root, tree_data, 0);
 
     ///tut slovov mojno chtobi polzovatel vvodil
-    //data = create_data(NULL , "123");
+    //data = create_data(NULL , "1");
     //root = create_node(data);
     while(extension) {
         print_tree(root, 0);
@@ -238,13 +238,11 @@ void tree_to_file(NODE *root, FILE *file, int depth)
     }
 
     if (root->data->question != NULL) {
-        fprintf(file, "%d", depth);
-        fputs(" Q ", file);
+        fputs("Q ", file);
         fputs(root->data->question, file);
         fputs("\n", file);
     } else {
-        fprintf(file, "%d", depth);
-        fputs(" A ", file);
+        fputs("A ", file);
         fputs(root->data->answer, file);
         fputs("\n", file);
     }
@@ -312,7 +310,6 @@ void free_tree(NODE *node) {
 ///////хачи это правильно
 void file_to_tree(NODE **root, FILE *file, int depth)
 {
-    char *number;
     char line[MAX_LINE_LENGTH];
 
     if (root == NULL || file == NULL) {
@@ -326,32 +323,24 @@ void file_to_tree(NODE **root, FILE *file, int depth)
 
     line[strcspn(line, "\n")] = '\0';
 
-    number = first_number_from_string(line);
-    if (number == NULL) {
-        return;
-    }
-
     NODE *node = malloc(sizeof(NODE));
     node->data = malloc(sizeof(DATA));
 
-    if (line[strlen(number) + 1] == 'Q') {
+    if (line[0] == 'Q') {
         DATA *data = node->data;
-        data->question = strdup(line + strlen(number) + 3);
+        data->question = strdup(line + 2);
         data->answer = NULL;
-    node->yes_branch = NULL;
-    node->no_branch = NULL;
-    *root = node;
-
-    file_to_tree(&((*root)->yes_branch), file, depth + 1);
-    file_to_tree(&((*root)->no_branch), file, depth + 1);
+        node->yes_branch = NULL;
+        node->no_branch = NULL;
+        *root = node;
+        file_to_tree(&((*root)->yes_branch), file, depth + 1);
+        file_to_tree(&((*root)->no_branch), file, depth + 1);
     } else {
         DATA *data = node->data;
-        data->answer = strdup(line + strlen(number) + 3);
+        data->answer = strdup(line + 2);
         data->question = NULL;
         node->yes_branch = NULL;
         node->no_branch = NULL;
         *root = node;
     }
-
-    free(number);
 }
