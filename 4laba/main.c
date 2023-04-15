@@ -3,6 +3,7 @@
 #define EMPTY_QUESTION '\0'
 #define MAX_LINE_LENGTH 1024
 
+
 LRESULT WindowProc (HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if(msg == WM_DESTROY){
@@ -16,7 +17,7 @@ typedef struct {
     char *answer;
 } DATA;
 
-typedef struct Node{
+typedef struct Node {
     DATA *data;
     struct Node *yes_branch;
     struct Node *no_branch;
@@ -25,13 +26,18 @@ typedef struct Node{
 DATA *create_data(const char *question, const char *answer);
 NODE *create_node(DATA *data);
 void check_answer(char *answer);
-void check_yes_no_answer(NODE *root, const char *answer);
 int ask_question(NODE **node, const char *answer);
 void run_through_tree(NODE **root);
 void rebase_tree(NODE **node);
 void print_tree(NODE *root, int depth);
 void tree_to_file(NODE *root, FILE *file, int depth);
-void read_questions_and_answers_from_file(NODE **root, FILE *file, int depth);
+
+char *first_number_from_string(const char *string);
+
+void file_to_tree(NODE **root, FILE *file, int depth);
+
+void add_node(NODE *parent, NODE *node, char direction);
+void free_data(DATA *data);
 
 
 int main() {
@@ -40,7 +46,7 @@ int main() {
     FILE *tree_data;
     int extension = 1;
 
-    tree_data = fopen("tree_data.txt", "wt");
+    tree_data = fopen("tree_data.txt", "rt");
 
     if(tree_data == NULL)
     {
@@ -48,12 +54,11 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    //read_questions_and_answers_from_file(&root, tree_data);
-    //print_tree(root, 0);
+    file_to_tree(&root, tree_data, 0);
 
     ///tut slovov mojno chtobi polzovatel vvodil
-    data = create_data(NULL , "123");
-    root = create_node(data);
+    //data = create_data(NULL , "123");
+    //root = create_node(data);
     while(extension) {
         print_tree(root, 0);
         run_through_tree(&root);
@@ -105,12 +110,7 @@ void run_through_tree(NODE **root)
         printf("It's %s!\n", strcmp("Yes", answer) == 0 ? tmp->yes_branch->data->answer : tmp->no_branch->data->answer);
 
         rebase_tree(strcmp("Yes", answer) == 0 ? &tmp->yes_branch : &tmp->no_branch);
-
-
 }
-
-
-
 
 int ask_question(NODE **node, const char *answer)
 {
@@ -125,19 +125,6 @@ int ask_question(NODE **node, const char *answer)
     }
     return 0;
 }
-
-/*
-void check_yes_no_answer(NODE *root, const char *answer)
-{
-    if (strcmp("Yes", answer) == 0)
-    {
-        printf("It's %s!\n", root->data->answer_yes);
-    }
-    else if (strcmp("No", answer) == 0)
-        printf("It's %s!\n", root->data->answer_no);
-}
-*/
-
 
 void rebase_tree(NODE **node)
 {
@@ -184,12 +171,6 @@ void rebase_tree(NODE **node)
     }
 }
 
-
-
-
-
-
-
 void check_answer(char *answer)
 {
     scanf_s("%s", answer);
@@ -199,16 +180,6 @@ void check_answer(char *answer)
         scanf_s("%s", answer);
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 DATA *create_data(const char *question, const char *answer)
 {
@@ -260,42 +231,20 @@ void print_tree(NODE *root, int depth) {
     print_tree(root->no_branch, depth + 1);
 }
 
-NODE *create_node(DATA *data)
-{
-    if(data == NULL )
-        exit(EXIT_FAILURE);
-    NODE *node = malloc(sizeof(NODE));
-
-    if (!node) {
-        return NULL;
-    }
-
-    ////CPY data tut nada
-    node->data = data;
-    node->yes_branch = NULL;
-    node->no_branch = NULL;
-    return node;
-}
-
-
 void tree_to_file(NODE *root, FILE *file, int depth)
 {
     if (root == NULL) {
         return;
     }
 
-
-    /*for (int i = 0; i < depth; i++) {
-        fputs(" ", file);
-    }*/
     if (root->data->question != NULL) {
         fprintf(file, "%d", depth);
-        fputs(" ", file);
+        fputs(" Q ", file);
         fputs(root->data->question, file);
         fputs("\n", file);
     } else {
         fprintf(file, "%d", depth);
-        fputs(" ", file);
+        fputs(" A ", file);
         fputs(root->data->answer, file);
         fputs("\n", file);
     }
@@ -304,37 +253,105 @@ void tree_to_file(NODE *root, FILE *file, int depth)
     tree_to_file(root->no_branch, file, depth + 1);
 }
 
-/////здесь нужно дописать чтобы до пробела обрезало лайн в отедльный буфер затем на атоичах сравнивало с депсом
-/// если равно то добавлять в ноуд то что идет за цифрами и проеблом (strlen(buff) + 1)
-/// затем искать такое же поле с депсом и если его нет то обозначать данное поле как рут
-/// после условия уже идет создания левого и правого случая
-/// рекурсивный вызов для левого и правого случая
-/// все канец
-void read_questions_and_answers_from_file(NODE **root, FILE *file, int depth) {
+NODE *create_node(DATA *data) {
+    NODE *node = (NODE *) malloc(sizeof(NODE));
+    node->data = data;
+    node->yes_branch = NULL;
+    node->no_branch = NULL;
+    return node;
+}
+
+char* first_number_from_string(const char* string) {
+    char* number = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
+    int i = 0;
+    while (string[i] != ' ' && string[i] != '\n' && string[i] != '\0') {
+        number[i] = string[i];
+        i++;
+    }
+    if (i != 0) {
+        number[i] = '\0';
+        return number;
+    } else {
+        free(number);
+        return NULL;
+    }
+}
+
+void add_node(NODE *parent, NODE *node, char direction) {
+    if (direction == 'Y') {
+        parent->yes_branch = node;
+    } else {
+        parent->no_branch = node;
+    }
+}
+
+void free_data(DATA *data) {
+    if (data->question != NULL) {
+        free(data->question);
+    }
+    if (data->answer != NULL) {
+        free(data->answer);
+    }
+    free(data);
+}
+
+void free_tree(NODE *node) {
+    if (node->yes_branch != NULL) {
+        free_tree(node->yes_branch);
+    }
+    if (node->no_branch != NULL) {
+        free_tree(node->no_branch);
+    }
+    free_data(node->data);
+    free(node);
+}
+
+
+
+
+///////хачи это правильно
+void file_to_tree(NODE **root, FILE *file, int depth)
+{
+    char *number;
     char line[MAX_LINE_LENGTH];
 
-    if (fgets(line, MAX_LINE_LENGTH, file) == NULL) {
+    if (root == NULL || file == NULL) {
+        return;
+    }
+
+    if(fgets(line, MAX_LINE_LENGTH, file) == NULL)
+    {
         return;
     }
 
     line[strcspn(line, "\n")] = '\0';
 
+    number = first_number_from_string(line);
+    if (number == NULL) {
+        return;
+    }
 
     NODE *node = malloc(sizeof(NODE));
     node->data = malloc(sizeof(DATA));
-    node->data->question = NULL;
-    node->data->answer = NULL;
-    if (line[0] == 'Q') {
-        node->data->question = strdup(line + 2);
-        printf("q = %s\n", node->data->question);
-    } else if (line[0] == 'A') {
-        node->data->answer = strdup(line + 2);
-        printf("a = %s\n", node->data->answer);
-    }
 
+    if (line[strlen(number) + 1] == 'Q') {
+        DATA *data = node->data;
+        data->question = strdup(line + strlen(number) + 3);
+        data->answer = NULL;
     node->yes_branch = NULL;
     node->no_branch = NULL;
     *root = node;
-    read_questions_and_answers_from_file(&node->no_branch, file, depth + 1);
-    read_questions_and_answers_from_file(&node->yes_branch, file, depth + 1);
+
+    file_to_tree(&((*root)->yes_branch), file, depth + 1);
+    file_to_tree(&((*root)->no_branch), file, depth + 1);
+    } else {
+        DATA *data = node->data;
+        data->answer = strdup(line + strlen(number) + 3);
+        data->question = NULL;
+        node->yes_branch = NULL;
+        node->no_branch = NULL;
+        *root = node;
+    }
+
+    free(number);
 }
