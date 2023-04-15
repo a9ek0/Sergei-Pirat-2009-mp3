@@ -39,12 +39,11 @@ void file_to_tree(NODE **root, FILE *file, int depth);
 void add_node(NODE *parent, NODE *node, char direction);
 void free_data(DATA *data);
 
+void menu(NODE **root, const char *file_name);
 
 int main() {
     NODE *root = NULL;
-    DATA *data;
-    FILE *tree_data;
-    int extension = 1;
+    /*int extension = 1;
 
     tree_data = fopen("tree_data.txt", "rt");
 
@@ -54,32 +53,88 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    file_to_tree(&root, tree_data, 0);
+
 
     ///tut slovov mojno chtobi polzovatel vvodil
     //data = create_data(NULL , "1");
-    //root = create_node(data);
-    while(extension) {
-        print_tree(root, 0);
-        run_through_tree(&root);
-        printf("Do you want to continue?\n");
-        scanf_s("%d", &extension);
-    }
-    printf("Do you want to save this tree?\n");
-    scanf_s("%d", &extension);
-    if(!extension)
-    {
-        free(root);
-        free(data);
-        fclose(tree_data);
-        return 0;
-    }else{
-        tree_to_file(root, tree_data, 0);
-    }
-    free(data);
+    //root = create_node(data);*/
+
+    menu(&root, "tree_data.txt");
+
     free(root);
-    fclose(tree_data);
     return 0;
+}
+
+void menu(NODE **root, const char *file_name)////позжe убрать поле file_name
+{
+    char choose_game[strlen("Continue") + 1];
+
+    printf("Do you want to start new game or continue?(New/Continue)\n");
+
+    fgets(choose_game, strlen("Continue") + 1, stdin);
+
+    while(strcmp(choose_game, "New") != 0 && strcmp(choose_game, "Continue") != 0)
+    {
+        fflush(stdin);
+        fgets(choose_game, strlen("Continue") + 1, stdin);
+    }
+
+    if(strcmp("New", choose_game) == 0){
+        char *extension;
+
+        extension = (char*) malloc((strlen("Yes") + 1) * sizeof (char));
+        strcpy(extension, "Yes");
+
+        while(strcmp(extension, "Yes") == 0) {
+            print_tree(*root, 0);
+            run_through_tree(root);
+
+            printf("Do you want to continue?\n");
+            fgets(choose_game, strlen("Yes") + 1, stdin);
+
+            while(strcmp(extension, "Yes") != 0 || strcmp(extension, "No") != 0)
+            {
+                fflush(stdin);
+                fgets(choose_game, strlen("Yes") + 1, stdin);
+            }
+        }
+        printf("Do you want to save this tree?\n");
+        fgets(choose_game, strlen("Yes") + 1, stdin);
+
+        while(strcmp(extension, "Yes") != 0 || strcmp(extension, "No") != 0)
+        {
+            fflush(stdin);
+            fgets(choose_game, strlen("Yes") + 1, stdin);
+        }
+        if(strcmp(extension, "No") == 0)
+        {
+            exit(EXIT_SUCCESS);
+        }else{
+            /////// имя файла должен вводить пользователь
+            /// и если пользователь ввел имя которое уже существует
+            /// вывести ошибку и попросить ввести имя еще раз
+            FILE *file;
+            file = fopen(file_name, "wt");
+            if(file == NULL)
+            {
+                return;
+            }
+            tree_to_file(*root, file, 0);
+            fclose(file);
+        }
+    } else if(strcmp("Continue", choose_game) == 0){
+        //////добавить список игр в отдельном текстовом файле + выбор
+        FILE *file;
+        file = fopen(file_name, "rt");
+        if(file == NULL)
+            return;
+        file_to_tree(root, file, 0);
+        ///// нужно как-то не замусорив код вернуться к предыдущему
+        /// где новая игра чтобы была возможность изменять текущую игру
+        /// функция некая
+        print_tree(*root, 0);
+        fclose(file);
+    }
 }
 
 void run_through_tree(NODE **root)
@@ -152,11 +207,11 @@ void rebase_tree(NODE **node)
 
         DATA *yes_data = create_data(NULL , correct_answer);
         NODE *yes_node = create_node(yes_data);
-     //   free(yes_data);
+        free(yes_data);
 
         DATA *no_data = create_data(NULL , (*node)->data->answer);
         NODE *no_node = create_node(no_data);
-      //  free(no_data);
+        free(no_data);
 
         NODE* tmp = *node;
         tmp->yes_branch = yes_node;
@@ -303,9 +358,6 @@ void free_tree(NODE *node) {
     free_data(node->data);
     free(node);
 }
-
-
-
 
 ///////хачи это правильно
 void file_to_tree(NODE **root, FILE *file, int depth)
