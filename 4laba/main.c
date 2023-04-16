@@ -12,11 +12,16 @@ LRESULT WindowProc (HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int main(int argc, char *argv[]) {
 
-    /* NODE *root = NULL;
+    //проверить надо будет ввод в дерево, а то какая-то хуйня
 
-    menu(&root, "tree_data.txt");
+    NODE *root = NULL;
+    DATA *data;
+    data = create_data(NULL, "Pudge");
+    root = create_node(data);
+    menu(&root);
 
-    free(root);*/
+    free_data(data);
+    free(root);
 
     return 0;
 }

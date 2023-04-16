@@ -1,81 +1,161 @@
 #include "functions.h"
 
-void menu(NODE **root, const char *file_name)////позжe убрать поле file_name
+void menu(NODE **root)
 {
-    ////выбор листа
-    char choose[strlen("Continue") + 1];
+////выбор режима
+    char choose[MAX_INPUT_LENGTH];
     printf("Do you want to start new game or continue?(New/Continue)\n");
-    fgets(choose, strlen("Continue") + 1, stdin);
+    fgets(choose, MAX_INPUT_LENGTH, stdin);
 
-    while(strcmp(choose, "New") != 0 && strcmp(choose, "Continue") != 0)
+    while(strcmp(choose, "New\n") != 0 && strcmp(choose, "Continue\n") != 0)
     {
+        printf("Wrong input!");
         fflush(stdin);
-        fgets(choose, strlen("Continue") + 1, stdin);
+        fgets(choose, MAX_INPUT_LENGTH, stdin);
     }
-    ///если новая игра
-    if(strcmp("New", choose) == 0){
-        char *extension;
-
-        extension = (char*) malloc((strlen("Yes") + 1) * sizeof (char));
-        strcpy(extension, "Yes");
-
-        while(strcmp(extension, "Yes") == 0) {
-            print_tree(*root, 0);
-            run_through_tree(root);
-
-            printf("Do you want to continue?\n");
-            fgets(choose, strlen("Yes") + 1, stdin);
-
-            while(strcmp(extension, "Yes") != 0 || strcmp(extension, "No") != 0)
-            {
-                fflush(stdin);
-                fgets(choose, strlen("Yes") + 1, stdin);
-            }
-        }
-        //////сохранение дерева в файл
+///если новая игра
+    if(strcmp("New\n", choose) == 0){
+        manual_tree_filling(root);
+        print_tree(*root, 0);
+//////сохранение дерева в файл
+////// когда 1 раз выбираешь нет и сохраняешь багается прога
         printf("Do you want to save this game?\n");
-        fgets(choose, strlen("Yes") + 1, stdin);
+        fflush(stdin);
+        fgets(choose, MAX_INPUT_LENGTH, stdin);
 
-        while(strcmp(extension, "Yes") != 0 || strcmp(extension, "No") != 0)
+        while(strcmp(choose, "Yes\n") != 0 && strcmp(choose, "No\n") != 0)
         {
+            printf("Wrong input!\n");
             fflush(stdin);
-            fgets(choose, strlen("Yes") + 1, stdin);
+            fgets(choose, MAX_INPUT_LENGTH, stdin);
         }
-        if(strcmp(extension, "No") == 0)
+
+        if(strcmp(choose, "No\n") == 0)
         {
             exit(EXIT_SUCCESS);
         }else{//////проверять имя на нулевость может быть хз наверное нельзя вводить ничего
-            /////// имя файла должен вводить пользователь
-            /// и если пользователь ввел имя которое уже существует
-            /// вывести ошибку и попросить ввести имя еще раз
             FILE *file;
+            char *file_name;
+
+            file = fopen("games/games_list.txt", "at");
+            if(file == NULL)
+            {
+                return;
+            }
+
+            file_name = (char*) malloc(MAX_LINE_LENGTH * sizeof (char));
+            printf("Enter name of the game.\n");
+            fflush(stdin);
+            fgets(file_name, MAX_LINE_LENGTH, stdin);
+            file_name[strcspn(file_name, "\n")] = '\0';
+///////не работает проверка на существует файл или нет
+            while(is_in_file(file , file_name))
+            {
+                printf("A game with that name already exists!\n");
+                fflush(stdin);
+                fgets(file_name, MAX_LINE_LENGTH, stdin);
+            }
+
+            //fseek(file, 0, SEEK_END);
+
+            fputs(file_name, file);
+            //fputs("\n", file);
+
+            fclose(file);
+
+            file_name = add_extension(file_name, ".txt");
             file = fopen(file_name, "wt");
             if(file == NULL)
             {
+                free(file_name);
+                return;
+            }
+
+            tree_to_file(*root, file, 0);
+            printf("%s 1", file_name);
+            fclose(file);
+
+            free(file_name);
+        }
+//////здесь выбор уже существующей игры
+    } else if(strcmp("Continue\n", choose) == 0){
+
+        char *file_name;
+        file_name = choose_game();
+        file_name[strcspn(file_name, "\n")] = '\0';
+        file_name = add_extension(file_name, ".txt");
+        FILE *file;
+        file = fopen(file_name, "rt");
+        if(file == NULL){
+            free(file_name);
+            return;
+        }
+        file_to_tree(root, file, 0);
+
+        manual_tree_filling(root);
+
+        fclose(file);
+        printf("Do you want to save this game?\n");
+        fflush(stdin);
+        fgets(choose, MAX_INPUT_LENGTH, stdin);
+
+        while(strcmp(choose, "Yes\n") != 0 && strcmp(choose, "No\n") != 0)
+        {
+            printf("Wrong input!\n");
+            fflush(stdin);
+            fgets(choose, MAX_INPUT_LENGTH, stdin);
+        }
+
+        if(strcmp(choose, "No\n") == 0)
+        {
+            exit(EXIT_SUCCESS);
+        }else{
+            file = fopen(file_name, "wt");
+            if (file == NULL)
+            {
+                free(file_name);
                 return;
             }
             tree_to_file(*root, file, 0);
             fclose(file);
         }
-        //////здесь выбор уже существующей игры
-    } else if(strcmp("Continue", choose) == 0){
-        //////добавить список игр в отдельном текстовом файле + выбор
-        //char *file_name1;
-        file_name = choose_game();
-        FILE *file;
-        file = fopen(file_name, "rt");
-        if(file == NULL)
-            return;
-        file_to_tree(root, file, 0);
-        ///// нужно как-то не замусорив код вернуться к предыдущему
-        /// где новая игра чтобы была возможность изменять текущую игру
-        /// функция некая
-        print_tree(*root, 0);
-        fclose(file);
+        free(file_name);
     }
 }
 
-char *choose_game()
+void manual_tree_filling(NODE **root){
+    char *extension;
+
+    extension = (char*) malloc(MAX_INPUT_LENGTH * sizeof (char));
+    strcpy(extension, "Yes\n");
+
+    while(strcmp(extension, "Yes\n") == 0) {
+        print_tree(*root, 0);
+        run_through_tree(root);
+
+        printf("Do you want to continue?\n");
+
+        fflush(stdin);
+        fgets(extension, MAX_INPUT_LENGTH, stdin);
+
+        while(strcmp(extension, "Yes\n") != 0 && strcmp(extension, "No\n") != 0)
+        {
+            printf("Wrong input!");
+            fflush(stdin);
+            fgets(extension, MAX_INPUT_LENGTH, stdin);
+        }
+    }
+    free(extension);
+}
+
+char *add_extension(char *word, const char *extension)
+{
+    word[strcspn(word, "\n")] = '\0';
+    strcat(word, extension);
+    return word;
+}
+
+char *choose_game()///////проверка есть ли вообще что-то в файле
 {///////////тут \n есть нужно file_name[strcspn(file_name, "\n")] = '\0'; воткнуть
 /// но мб если с клавы вводить то проблем не будет если не будет то нужно будет в принтф добавить \n
     char *file_name;
@@ -93,6 +173,7 @@ char *choose_game()
         printf("%s", file_name);
     }
 
+    fflush(stdin);
     fgets(file_name, MAX_LINE_LENGTH, stdin);
     while(!is_in_file(file, file_name))
     {
@@ -111,7 +192,8 @@ int is_in_file(FILE *file, const char *word)
 {
     char line[MAX_LINE_LENGTH];
     fseek(file, 0, SEEK_SET);
-    while(fgets(line, MAX_LINE_LENGTH, file))
+
+    while(fgets(line, MAX_LINE_LENGTH, file) != NULL)
     {
         if(strcmp(word, line) == 0)
         {

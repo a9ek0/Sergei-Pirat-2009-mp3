@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #define MAX_LINE_LENGTH 1024
+#define MAX_INPUT_LENGTH 10
 typedef struct {
     char *question;
     char *answer;
@@ -31,8 +32,12 @@ void file_to_tree(NODE **root, FILE *file, int depth);
 void add_node(NODE *parent, NODE *node, char direction);
 void free_data(DATA *data);
 
-void menu(NODE **root, const char *file_name);
+void menu(NODE **root);
 
 char *choose_game();
 int is_in_file(FILE *file, const char *word);
+
+char *add_extension(char *word, const char *extension);
+
+void manual_tree_filling(NODE **root);
 #endif //INC_4LABA_FUNCTIONS_H
