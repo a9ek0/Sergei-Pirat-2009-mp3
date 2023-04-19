@@ -1,11 +1,8 @@
-#include <stdio.h>
-#include <Windows.h>
-#include "functions.h"
 #include "lyb/menu.h"
 
-int main(int argc, char *argv[]) {
+int main( ) {
     NODE *root = NULL;
-    //// заменить статическое выделение памяти на динамическое
+
     menu(&root);
 
     free_tree(root);

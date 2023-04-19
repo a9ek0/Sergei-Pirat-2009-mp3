@@ -36,7 +36,6 @@ void menu(NODE **root)
         get_question_or_answer(root_word);
         root_word = realloc(root_word, (strlen(root_word) + 1) * sizeof (char));
         replace_char(root_word, '\n', '\0');
-        //user added first word
 
         data = create_data(NULL, root_word);
         *root = create_node(data);

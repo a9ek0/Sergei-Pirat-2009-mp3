@@ -178,7 +178,6 @@ void manual_tree_filling(NODE **root, FILE *log_file){
     strcpy(choose, "Yes\n");
 
     while(strcmp(choose, "Yes\n") == 0) {
-        //print_tree(*root, 0);
         run_through_tree(root, log_file);
 
         printf("Do you want to continue?\n");
