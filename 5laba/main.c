@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #define CACHE_SIZE 10
 #define MAX_DOMAIN_LENGTH 256
 #define MAX_LINE_LENGTH 1024
@@ -36,20 +37,25 @@ char *get_ip_from_file(FILE *file, const char *key);
 void update_position(CACHE **cache, NODE *node);
 int check_input(const char *input, const char *str1, const char *str2);
 void get_input(char *input, const char *str1, const char *str2);
+int validate_ip_address(const char *ip_address);
+int contains_indents(const char *str);
+int contains_multiple_dots(const char *str);
+char *add_extension(char *word, const char *extension);
+void get_domains_associated_with_ip(const CACHE *cache, const char *value);
 
-/// dobavit proverku na nalichie v faile domena
+///dobavit v vivod vseh domenov s ip cname
+
 /// dobavit udalenie v hashe v add_to_chache
 
-///NE RABOTAET KALIZIA
 int main() {
     FILE *file;
 
     CACHE *cache;
 
     char file_name[16] = "domain_list.txt";
-    char *domain = malloc(MAX_DOMAIN_LENGTH * sizeof (char));
-    char *ip;
-    char choose[6];
+    char *domain = malloc(MAX_LINE_LENGTH * sizeof (char));
+    char *ip = malloc(MAX_LINE_LENGTH * sizeof (char));
+    char choose[MAX_LINE_LENGTH];
 
     cache = create_cache();
 
@@ -75,18 +81,56 @@ int main() {
 
             if (strcmp("Try\n", choose) == 0) {
                 printf("Enter domain name of the site to get IP.\n");
+                fflush(stdin);
                 fgets(domain, MAX_DOMAIN_LENGTH, stdin);
                 domain[strcspn(domain, "\n")] = '\0';
             }
             else if (strcmp("Add\n", choose) == 0)
             {
+                fclose(file);
 
+                file = fopen(file_name, "at");
+
+                printf("It's original name or canonical name?(Original/Canonical)\n");
+
+                fflush(stdin);
+                fgets(choose, MAX_LINE_LENGTH, stdin);
+
+                get_input(choose, "Original\n", "Canonical\n");
+
+                if(strcmp(choose, "Original\n") == 0){
+                    printf("Enter IP associated with that domain.\n");
+
+                    fflush(stdin);
+                    fgets(ip, MAX_LINE_LENGTH, stdin);
+                    ip[strcspn(ip, "\n")] = '\0';
+
+                    while(validate_ip_address(ip) == 0)
+                    {
+                        printf("Wrong input!\n");
+                        fflush(stdin);
+                        fgets(ip, MAX_LINE_LENGTH, stdin);
+                    }
+                    add_extension(ip, "\n");
+
+                    fprintf(file, "%s IN A %s", domain, ip);
+                }else if(strcmp(choose, "Canonical\n") == 0){
+
+                    printf("Enter original domain.\n");
+
+                    char *orig_domain = malloc(MAX_LINE_LENGTH * sizeof (char));
+                    fflush(stdin);
+
+                    fgets(orig_domain, MAX_LINE_LENGTH, stdin);
+                    fprintf(file, "%s IN CNAME %s", domain, orig_domain);
+                    get_domains_associated_with_ip(cache, "192.168.1.1\n");
+                }
+
+                fclose(file);
+                file = fopen(file_name, "rt");
             }
         }
         domain = realloc(domain, (strlen(domain) + 1) * sizeof(char));
-
-
-
 
         NODE *tmp = find_in_cache(domain, cache);
         if (tmp == NULL) {
@@ -283,14 +327,13 @@ char *get_ip_from_file(FILE *file, const char *key){
             }
             else if(line[strlen(buff_line) + 4] == 'C')
             {
-                strcpy(ip, (line + strlen(buff_line) + 9));
+                strcpy(ip, (line + strlen(buff_line) + 10));
                 ip[strcspn(ip, "\n")] = '\0';
-                rewind(file);
-                char *buff_ip;
-                ip = get_ip_from_file(file, ip);
+                char *result = get_ip_from_file(file, ip);
                 free(line);
                 free(buff_line);
-                return ip;
+                free(ip);
+                return result;
             }
 
         }
@@ -340,6 +383,80 @@ int check_input(const char *input, const char *str1, const char *str2) {
     }
 }
 
+int validate_ip_address(const char *ip_address) {
+    char *temp = strdup(ip_address);
+    if (contains_multiple_dots(ip_address) || contains_indents(ip_address)) { // проверка на несколько точек подряд
+        free(temp);
+        return 0;
+    }
+    int dots_count = 0;
+    const char *token = strtok(temp, ".");
+    while (token != NULL) {
+        dots_count++;
+        int len = strlen(token);
+        if (len == 0) {
+            free(temp);
+            return 0;
+        }
+        for (int i = 0; i < len; i++) {
+            if (!isdigit(token[i])) {
+                free(temp);
+                return 0;
+            }
+        }
+        char *endptr;
+        long num = strtol(token, &endptr, 10);
+        if (endptr != token + len || num < 0 || num > 255) {
+            free(temp);
+            return 0;
+        }
+        token = strtok(NULL, ".");
+    }
+    free(temp);
+    if (dots_count != 4) {
+        return 0;
+    }
+    return 1;
+}
 
+int contains_multiple_dots(const char *str) {
+    int len = strlen(str);
+    int dot_count = 0;
+    for (int i = 0; i < len; i++) {
+        if (str[i] == '.') {
+            dot_count++;
+            if (dot_count >= 2) {
+                return 1;
+            }
+        } else {
+            dot_count = 0;
+        }
+    }
+    return 0;
+}
 
+int contains_indents(const char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+        if (str[i] == ' ') {
+            return 1;
+        }
+    }
+    return 0;
+}
 
+char *add_extension(char *word, const char *extension)
+{
+    word[strcspn(word, "\n")] = '\0';
+    strcat(word, extension);
+    return word;
+}
+
+void get_domains_associated_with_ip(const CACHE *cache, const char *value){
+    NODE *tmp = cache->head;
+    while(tmp != NULL){
+        if (strcmp(tmp->value, value) == 0)
+            printf("%s\n", tmp->key);
+        tmp = tmp->next;
+    }
+}
