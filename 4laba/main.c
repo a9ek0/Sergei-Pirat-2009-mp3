@@ -6,6 +6,5 @@ int main( ) {
     menu(&root);
 
     free_tree(root);
-   return 0;
+    return 0;
 }
-
