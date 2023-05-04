@@ -15,10 +15,14 @@
 void dell_oldest_from_cache(CACHE **cache);
 void add_to_cache(CACHE *cache, const char *key, const char *value);
 int calculate_hash(const char *key);
-NODE *find_in_cache(const char *key, const CACHE *cache);
+char *find_in_cache(const char *key, const CACHE *cache);
 void print_cache(const CACHE *cache);
 void print_hash(const CACHE *cache);
-void update_position(CACHE **cache, NODE *node);
+void update_position(CACHE **cache, const char *value);
 
+char* get(CACHE *cache, const char *key);
 
+void put(CACHE *cache, const char *key, const char *value);
+
+void dell_tail(CACHE *cache);
 #endif //INC_5LABA_CACHE_H

@@ -9,7 +9,7 @@ void free_cache(CACHE *cache) {
     }
 
     for (int i = 0; i < CACHE_SIZE; i++) {
-        NODE *bucket = cache->hash->buckets[i];
+        NODE *bucket = cache->hash[i];
         while (bucket != NULL) {
             NODE *next = bucket->next;
             free(bucket->value);
@@ -28,23 +28,23 @@ void free_node(NODE *node) {
     free(node);
 }
 
-CACHE *create_cache() {
+CACHE* create_cache() {
     CACHE *cache = (CACHE*) malloc(sizeof(CACHE));
-    if (cache == NULL) {
-        return NULL;
-    }
     cache->size = 0;
     cache->head = NULL;
     cache->tail = NULL;
-
-    cache->hash = (HASH*) malloc(sizeof(HASH));
-    if (cache->hash == NULL) {
-        free(cache);
-        return NULL;
-    }
+    cache->hash = (NODE**) malloc(CACHE_SIZE * sizeof(NODE*));
     for (int i = 0; i < CACHE_SIZE; i++) {
-        cache->hash->buckets[i] = NULL;
+        cache->hash[i] = NULL;
     }
-
     return cache;
+}
+
+NODE* create_node(char *key, char *value) {
+    NODE *node = (NODE*) malloc(sizeof(NODE));
+    node->key = key;
+    node->value = value;
+    node->next = NULL;
+    node->prev = NULL;
+    return node;
 }

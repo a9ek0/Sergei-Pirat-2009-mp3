@@ -1,7 +1,6 @@
 #include "lyb/menu.h"
 #include "lyb/cache.h"
 
-
 /////dobavit proverku na enter
 ////mb ubrat canon iz vibora chto dobavit
 

@@ -102,27 +102,21 @@ void get_ip_and_domain(const CACHE *cache, const char *file_name, char **domain,
                 printf("Enter IP associated with that domain.\n");
                 get_valid_ip_address(&buff_ip);
 
-                fprintf(file, "%s IN A %s", buff_domain, buff_ip);
-
+                    fprintf(file, "%s IN A %s", buff_domain, buff_ip);
                 strcpy(*ip, buff_ip);
+
                 free(buff_ip);
                 break;
             } else if(strcmp(choose, "Canonical\n") == 0){
                 printf("Enter original domain.\n");
                 char *orig_domain = malloc(MAX_LINE_LENGTH * sizeof (char));
-                fclose(file);
-                file = fopen(file_name, "rt");
-                char* bb_ip = (char*) malloc(MAX_LINE_LENGTH * sizeof (char));
                 get_line(&orig_domain);
 
-                if (get_ip_from_file(file, orig_domain) == NULL)
-                {
-                    printf("This domain doesn't exist!\n");
-                    get_ip_and_domain(cache, file_name, &orig_domain, &bb_ip);
-                }
+
                 add_extension(orig_domain, "\n");
 
                 file = fopen(file_name, "at");
+
                 fprintf(file, "%s IN CNAME %s", buff_domain, orig_domain);
 
                 free(orig_domain);
